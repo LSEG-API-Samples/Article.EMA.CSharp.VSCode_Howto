@@ -1,2 +1,4 @@
 bin/
 obj/
+ema_project/obj
+ema_project/bin
