@@ -87,7 +87,11 @@ Hello, World!
 ```
 ### Add EMA Library
 
-The RTSDK C# libraries are available on the [NuGet](https://www.nuget.org/) package manager and distribution platform. We can add the [EMA Core library](https://www.nuget.org/packages/LSEG.Ema.Core) into the project with the ```dotnet add package LSEG.Ema.Core --version {version}``` command as follows.
+The RTSDK C# libraries are available on the [NuGet](https://www.nuget.org/) package manager and distribution platform. 
+
+![figure-2](images/02_ema_nuget.png "EMA library on NuGet")
+
+We can add the [EMA Core library](https://www.nuget.org/packages/LSEG.Ema.Core) into the project with the ```dotnet add package LSEG.Ema.Core --version {version}``` command as follows.
 
 ```bash
 $>ema_project>dotnet add package LSEG.Ema.Core --version 3.1.0
