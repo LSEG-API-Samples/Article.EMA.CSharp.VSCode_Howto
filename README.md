@@ -107,7 +107,7 @@ info :   OK https://api.nuget.org/v3-flatcontainer/lseg.ema.core/3.1.0/lseg.ema.
 ....
 info : Package 'LSEG.Ema.Core' is compatible with all the specified frameworks in project 'C:\ema_project\ema_project.csproj'.
 info : PackageReference for package 'LSEG.Ema.Core' version '3.1.0' added to file 'C:\ema_project\ema_project.csproj'.
-info : Writing assets file to disk. Path: C:\drive_d\Project\Code\EMA_dotnet_vscode\ema_project\obj\project.assets.json
+info : Writing assets file to disk. Path: C:\ema_project\obj\project.assets.json
 log  : Restored C:\ema_project.csproj (in 6.7 sec).
 
 C:\ema_project>
