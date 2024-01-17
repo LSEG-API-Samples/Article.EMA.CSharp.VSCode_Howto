@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmaConfig>
+
+<!-- ConsumerGroup provides set of detailed configurations to be used by named consumers				-->
+<!-- Application specifies which configuration to use by setting OmmConsumerConfig::consumerName()		-->
+<ConsumerGroup>
+	<!-- DefaultConsumer parameter defines which consumer configuration is used by OmmConsumer			-->
+	<!-- if application does not specify it through OmmConsumerConfig::consumerName()					-->
+	<!-- first consumer on the ConsumerList is a DefaultConsumer if this parameter is not specified		-->
+	<DefaultConsumer value="Consumer_4"/>
+	<ConsumerList>
+		<Consumer>
+			<Name value="Consumer_4"/>
+			<!-- ChannelSet specifies an ordered list of Channels to which OmmConsumer will attempt to	-->
+			<!-- connect, one at a time, if the previous one fails to connect							-->
+			<ChannelSet value="Channel_4"/>
+			<Logger value="Logger_1"/>
+			<Dictionary value="Dictionary_1"/>
+			<XmlTraceToStdout value="0"/>
+		</Consumer>
+	</ConsumerList>
+</ConsumerGroup>
+
+<ChannelGroup>
+	<ChannelList>
+		<Channel>
+			<Name value="Channel_4"/>
+			<ChannelType value="ChannelType::RSSL_ENCRYPTED"/>
+			<CompressionType value="CompressionType::None"/>
+			<GuaranteedOutputBuffers value="5000"/>
+			<!-- EMA discovers a host and a port from RDP service discovery for the specified location 
+			    when both of them are not set and the session management is enable. -->
+			<Location value="ap-southeast-1"/>
+			<EnableSessionManagement value="1"/>
+			<EncryptedProtocolType value="EncryptedProtocolType::RSSL_SOCKET"/>
+		</Channel>
+	</ChannelList>
+</ChannelGroup>
+<LoggerGroup>
+	<LoggerList>
+		<Logger>
+			<Name value="Logger_1"/>
+
+			<!-- LoggerType is optional:  defaulted to "File"											-->
+			<!-- possible values: Stdout, File															-->
+			<LoggerType value="LoggerType::Stdout"/>
+
+			<!-- LoggerSeverity is optional: defaulted to "Success"										-->
+			<!-- possible values: Verbose, Success, Warning, Error, NoLogMsg							-->
+			<LoggerSeverity value="LoggerSeverity::Success"/>
+		</Logger>
+	</LoggerList>
+</LoggerGroup>
+<DictionaryGroup>
+	<DictionaryList>
+		<Dictionary>
+			<Name value="Dictionary_1"/>
+			<!-- dictionaryType is optional: defaulted to ChannelDictionary" -->
+			<!-- possible values: ChannelDictionary, FileDictionary -->
+			<!-- if dictionaryType is set to ChannelDictionary, file names are ignored -->
+			<DictionaryType value="DictionaryType::ChannelDictionary"/>
+		</Dictionary>
+	</DictionaryList>
+</DictionaryGroup>
+</EmaConfig>
