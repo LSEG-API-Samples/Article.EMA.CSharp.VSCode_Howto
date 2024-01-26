@@ -37,8 +37,8 @@ class Program
             AppClient appClient = new();
             Console.WriteLine("Connecting to market data server");
 
-            string? clientID = Environment.GetEnvironmentVariable("CLIENT_ID");
-            string? clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
+            string clientID = Environment.GetEnvironmentVariable("CLIENT_ID") ?? "<Client_ID>";
+            string clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? "<Client_Secret>";
             OmmConsumerConfig config = new OmmConsumerConfig().ClientId(clientID).ClientSecret(clientSecret);
             // create OMM consumer
             consumer = new OmmConsumer(config);

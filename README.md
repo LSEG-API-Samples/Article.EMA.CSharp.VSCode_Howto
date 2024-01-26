@@ -224,7 +224,8 @@ class Program
     }
 }
 ```
-The final step is to create the ```EmaConfig.xml``` file with the following content:
+		<Channel>
+The final step is to create the ```EmaConfig.xml``` file with the configurations based on this [Enterprise Message API (EMA) - Configuration Overview](https://developers.lseg.com/en/article-catalog/article/elektron-message-api-ema-configuration-overview) article. The main point is set the ```Channel``` to connect to RTO.
 
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -265,41 +266,164 @@ The final step is to create the ```EmaConfig.xml``` file with the following cont
 		</Channel>
 	</ChannelList>
 </ChannelGroup>
-<LoggerGroup>
-	<LoggerList>
-		<Logger>
-			<Name value="Logger_1"/>
-
-			<!-- LoggerType is optional:  defaulted to "File"											-->
-			<!-- possible values: Stdout, File															-->
-			<LoggerType value="LoggerType::Stdout"/>
-
-			<!-- LoggerSeverity is optional: defaulted to "Success"										-->
-			<!-- possible values: Verbose, Success, Warning, Error, NoLogMsg							-->
-			<LoggerSeverity value="LoggerSeverity::Success"/>
-		</Logger>
-	</LoggerList>
-</LoggerGroup>
-<DictionaryGroup>
-	<DictionaryList>
-		<Dictionary>
-			<Name value="Dictionary_1"/>
-			<!-- dictionaryType is optional: defaulted to ChannelDictionary" -->
-			<!-- possible values: ChannelDictionary, FileDictionary -->
-			<!-- if dictionaryType is set to ChannelDictionary, file names are ignored -->
-			<DictionaryType value="DictionaryType::ChannelDictionary"/>
-		</Dictionary>
-	</DictionaryList>
-</DictionaryGroup>
+...
 </EmaConfig>
 ```
 
-## A single project
+### Build and Run Real-Time Application Source Code
 
-1. dotnet new console --framework net6.0 --use-program-main
-2. dotnet add package LSEG.Ema.Core --version 3.1.0
-3. dotnet build
-4. dotnet run
+My next point is building and running the application we just created. To build the project, use the [dotnet build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) command inside the ```ema_project``` folder.
+
+```bash
+dotnet build
+```
+
+Or 
+
+```bash
+dotnet build --configuration {Debug or Release}
+```
+Please note that the default configuration value is **Debug**.
+
+Example:
+
+```bash
+C:\ema_project> dotnet build 
+MSBuild version 17.3.2+561848881 for .NET
+  Determining projects to restore...
+  Restored C:\ema_project/ema_project.csproj (in 468 ms).
+  ema_project -> C:\ema_project/bin/Debug/net6.0/ema_project.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.33
+C:\ema_project>
+```
+Then the generated executable ```dll``` and ```exe``` will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
+
+![figure-3](images/03_ema_dotnet_build.png "dotnet build result")
+
+Please keep in mind that the product of ```dotnet build``` **isn't ready to be transferred to another machine to run**. To create a version of the application that can be deployed, you need to publish it (for example, with the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command).
+
+For more detail about the dotnet build command options, please check the [dotnet build document](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) page.
+
+Next, we come to the [dotnet run](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-run) command. This command provides a convenient option to run your application from the source code with one command. 
+
+```bash
+dotnet run
+```
+
+Please note that the ```dotnet run``` command automatically build the project using ```dotnet build``` if necessary. 
+
+Example:
+
+```bash
+C:\ema_project> dotnet run
+Connecting to market data server
+
+INFO|: loggerMsg
+    ClientName: ChannelCallbackClient
+    Severity: Info    Text:    Received ChannelUp event on channel Channel_4
+        Instance Name Consumer_4_1
+        Component Version ads3.7.0.E4.linux.rrg 64-bit
+loggerMsgEnd
+Subscribing to market data
+RefreshMsg
+    streamId="1"
+    domain="Login Domain"
+    solicited
+    RefreshComplete
+    state="Open / Ok / None / 'Login accepted by host ads-fanout-sm-az1-apse1-prd.'"
+    ...
+    Attrib dataType="ElementList"
+        ElementList
+            ElementEntry name="AllowSuspectData" dataType="UInt" value="1"
+            ElementEntry name="ApplicationId" dataType="Ascii" value="256"
+            ElementEntry name="ApplicationName" dataType="Ascii" value="RTO"
+            ...
+        ElementListEnd
+    AttribEnd
+    Payload dataType="NoData"
+        NoData
+        NoDataEnd
+    PayloadEnd
+RefreshMsgEnd
+
+RefreshMsg
+    streamId="5"
+    domain="MarketPrice Domain"
+    solicited
+    ...
+    name="JPY="
+    nameType="1"
+    serviceId="257"
+    serviceName="ELEKTRON_DD"
+    Payload dataType="FieldList"
+        FieldList FieldListNum="99" DictionaryId="1"
+            FieldEntry fid="1" name="PROD_PERM" dataType="UInt" value="526"
+            FieldEntry fid="2" name="RDNDISPLAY" dataType="UInt" value="153"
+            FieldEntry fid="3" name="DSPLY_NAME" dataType="Rmtes" value="BARCLAYS     LON"
+            FieldEntry fid="5" name="TIMACT" dataType="Time" value="08:58:00:000:000:000"
+            FieldEntry fid="11" name="NETCHNG_1" dataType="Real" value="0.15"
+            FieldEntry fid="12" name="HIGH_1" dataType="Real" value="147.88"
+            FieldEntry fid="13" name="LOW_1" dataType="Real" value="147.49"
+            FieldEntry fid="15" name="CURRENCY" dataType="Enum" value="392"
+            FieldEntry fid="17" name="ACTIV_DATE" dataType="Date" value="26 JAN 2024 "
+            FieldEntry fid="19" name="OPEN_PRC" dataType="Real" value="147.61"
+            FieldEntry fid="21" name="HST_CLOSE" dataType="Real" value="147.65"
+            FieldEntry fid="22" name="BID" dataType="Real" value="147.8"
+            FieldEntry fid="23" name="BID_1" dataType="Real" value="147.81"
+            FieldEntry fid="24" name="BID_2" dataType="Real" value="147.79"
+            FieldEntry fid="25" name="ASK" dataType="Real" value="147.83"
+            ...
+            FieldEntry fid="14208" name="BID_HR_MS" dataType="Time" value="08:00:00:289:000:000"
+        FieldListEnd
+    PayloadEnd
+RefreshMsgEnd
+
+UpdateMsg
+    streamId="5"
+    domain="MarketPrice Domain"
+    updateTypeNum="0"
+    name="JPY="
+    serviceId="257"
+    serviceName="ELEKTRON_DD"
+    Payload dataType="FieldList"
+        FieldList
+            FieldEntry fid="22" name="BID" dataType="Real" value="147.81"
+            FieldEntry fid="393" name="PRIMACT_1" dataType="Real" value="147.81"
+            FieldEntry fid="25" name="ASK" dataType="Real" value="147.82"
+        FieldListEnd
+    PayloadEnd
+UpdateMsgEnd
+...
+```
+
+The ```dotnet run``` command is used in the context of projects, not built assemblies. If you're trying to run a framework-dependent application DLL instead, you must use dotnet without a command inside *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder like the following example:
+
+```bash
+C:\ema_project\bin\Debug\net6.0> dotnet ema_project.dll
+```
+
+Please note that when running a framework-dependent application DLL above, you need to copy all necessary files (like the EmaConfig.xml) to the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as well.
+
+For more detail about the run options, please check the [dotnet run document](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-run) page.
+
+### Publishing the Project
+
+You can publish the .NET application in 2 modes as follows:
+- *self-contained* mode: This mode produces an application that includes the .NET runtime and libraries, and your application and its dependencies. Users of the application can run it on a machine that doesn't have the .NET runtime installed.
+- *framework-dependent*: This mode produces an application that includes only your application itself and its dependencies. Users of the application have to separately install the .NET runtime.
+
+Please note that both publishing modes produce a platform-specific executable by default. Framework-dependent applications can be created without an executable, and these applications are cross-platform.
+
+[tbd]
+
+please find more detail on the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) and [.NET application publishing overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/) documents.
+
+[tbd]
 
 ## A Solution
 1. dotnet new sln
