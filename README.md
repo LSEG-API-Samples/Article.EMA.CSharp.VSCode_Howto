@@ -413,17 +413,55 @@ For more detail about the run options, please check the [dotnet run document](ht
 
 ### Publishing the Project
 
-You can publish the .NET application in 2 modes as follows:
+The ```dotnet publish ``` compiles the application, reads through its dependencies specified in the project file, and publishes the resulting set of files to a directory (containing dll, configuration json files, dependencies files, etc). The command output is ready for deployment to a hosting system for execution.  You can publish the .NET application in 2 modes as follows:
 - *self-contained* mode: This mode produces an application that includes the .NET runtime and libraries, and your application and its dependencies. Users of the application can run it on a machine that doesn't have the .NET runtime installed.
 - *framework-dependent*: This mode produces an application that includes only your application itself and its dependencies. Users of the application have to separately install the .NET runtime.
 
 Please note that both publishing modes produce a platform-specific executable by default. Framework-dependent applications can be created without an executable, and these applications are cross-platform.
 
-[tbd]
+Example: creates a framework-dependent executable for the current platform.
 
-please find more detail on the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) and [.NET application publishing overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/) documents.
+```bash
+# On Windows
 
-[tbd]
+C:\ema_project>dotnet publish
+MSBuild version 17.5.0-preview-23061-01+040e2a90e for .NET
+  Determining projects to restore...
+  Restored C:\ema_project\ema_project.csproj (in 1.82 sec).
+  ema_project -> C:\ema_project\bin\Debug\net6.0\ema_project.dll    
+  ema_project -> C:\ema_project\bin\Debug\net6.0\publish\
+
+C:\ema_project>
+```
+Result:
+
+![figure-4](images/04_ema_dotnet_publish_1.png "Publish a framework-dependent executable result")
+
+Example: creates a self-contained executable for the Linux platform.
+
+```bash
+# On Windows
+
+C:\ema_project>dotnet publish --configuration Release --runtime linux-x64 --self-contained
+MSBuild version 17.5.0-preview-23061-01+040e2a90e for .NET
+  Determining projects to restore...
+  Restored C:\ema_project\ema_project.csproj (in 3.04 sec).
+  ema_project -> C:\ema_project\bin\Release\net6.0\linux-x64\ema_project.dll
+  ema_project -> C:\ema_project\bin\Release\net6.0\linux-x64\publish\
+
+C:\ema_project>
+```
+Result:
+![figure-5](images/05_ema_dotnet_publish_2.png "Publish a self-contained executable for Linux x64 result")
+
+Then you can copy a result directory with all dependencies files to deploy and run on your target machine using the ema_project binary file (based on your runtime, example ```$:/mnt/c/ema_project/bin/Release/net6.0/linux-x64/publish$ ./ema_project```).
+
+To learn more about the publish and deployment options, please check the following resources:
+* [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) document.
+* [.NET runtime identifier catalog](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog) document.
+* [.NET application publishing overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/) documents.
+
+That all I have to say about creating the EMA .NET Project using VS Code.
 
 ## A Solution
 1. dotnet new sln
