@@ -42,8 +42,7 @@ The RTSDK C# libraries (both ETA and EMA APIs) are available on the [NuGet](http
 
 Let's me start with how to create a single EMA C# .NET project. 
 
-
-### Initialize Project
+### Initialize A Project
 
 Firstly, create a new folder name ```ema_project``` in your workbench environment.
 
@@ -51,27 +50,24 @@ Firstly, create a new folder name ```ema_project``` in your workbench environmen
 $>mkdir ema_project
 ```
 
-Next, access the ```ema_project``` and create a new console project with the following command:
+Next, access the ```ema_project``` folder and create a new console project with the following command:
 
 ```bash
-$>ema_project>dotnet new console --framework net6.0 --use-program-main
+dotnet new console --framework net6.0 --use-program-main
 ```
 Example result:
 
 ```bash
-C:\>cd ema_project
+root:/mnt/c$cd ema_project
 
-C:\ema_project>dotnet new console --framework net6.0 --use-program-main
+root:/mnt/c/ema_project$ dotnet new console --framework net6.0 --use-program-main
 The template "Console App" was created successfully.
 
 Processing post-creation actions...
-Restoring C:\ema_project\ema_project.csproj:
+Running 'dotnet restore' on /mnt/c/ema_project/ema_project.csproj...
   Determining projects to restore...
-  Restored C:\ema_project.csproj (in 76 ms).
+  Restored /mnt/c/ema_project/ema_project.csproj (in 77 ms).
 Restore succeeded.
-
-
-C:\ema_project>
 ```
 
 The ```dotnet new console --framework net6.0 --use-program-main``` command creates a new console project with .NET 6.0 framework for you. The command also create a simple application ```Program.cs``` for as a starting point for the project as follows:
@@ -81,7 +77,7 @@ The ```dotnet new console --framework net6.0 --use-program-main``` command creat
 We can test our project creation by running this ```Program.cs``` with the following command:
 
 ```bash
-$>ema_project>dotnet run
+root:/mnt/c/ema_project$dotnet run
 
 Hello, World!
 ```
@@ -94,24 +90,24 @@ The RTSDK C# libraries are available on the [NuGet](https://www.nuget.org/) pack
 We can add the [EMA Core library](https://www.nuget.org/packages/LSEG.Ema.Core) into the project with the ```dotnet add package LSEG.Ema.Core --version {version}``` command as follows.
 
 ```bash
-$>ema_project>dotnet add package LSEG.Ema.Core --version 3.1.0
+dotnet add package LSEG.Ema.Core --version 3.1.0
 ```
 Result:
 ```bash
-C:\ema_project>dotnet add package LSEG.Ema.Core --version 3.1.0
+root:/mnt/c/ema_project$ dotnet add package LSEG.Ema.Core --version 3.1.0
   Determining projects to restore...
-  Writing C:\Users\<user>\AppData\Local\Temp\tmpEB94.tmp
+  Writing /tmp/tmp9S2ovj.tmp
 info : X.509 certificate chain validation will use the default trust store selected by .NET.
 info : X.509 certificate chain validation will use the default trust store selected by .NET.
-info : Adding PackageReference for package 'LSEG.Ema.Core' into project 'C:\ema_project\ema_project.csproj'.info : Restoring packages for C:\ema_project\ema_project.csproj...
+info : Adding PackageReference for package 'LSEG.Ema.Core' into project '/mnt/c/ema_project/ema_project.csproj'.info : Restoring packages for C:\ema_project\ema_project.csproj...
 info :   GET https://api.nuget.org/v3-flatcontainer/lseg.ema.core/index.json
 info :   OK https://api.nuget.org/v3-flatcontainer/lseg.ema.core/index.json 1492ms
 info :   GET https://api.nuget.org/v3-flatcontainer/lseg.ema.core/3.1.0/lseg.ema.core.3.1.0.nupkg
 info :   OK https://api.nuget.org/v3-flatcontainer/lseg.ema.core/3.1.0/lseg.ema.core.3.1.0.nupkg 829ms
 ....
-info : Package 'LSEG.Ema.Core' is compatible with all the specified frameworks in project 'C:\ema_project\ema_project.csproj'.
-info : PackageReference for package 'LSEG.Ema.Core' version '3.1.0' added to file 'C:\ema_project\ema_project.csproj'.
-info : Writing assets file to disk. Path: C:\ema_project\obj\project.assets.json
+info : Package 'LSEG.Ema.Core' is compatible with all the specified frameworks in project '/mnt/c/ema_project/ema_project.csproj'.
+info : PackageReference for package 'LSEG.Ema.Core' version '3.1.0' added to file '/mnt/c/ema_project/ema_project.csproj'.
+info : Writing assets file to disk. Path:  /mnt/c/ema_project/obj/project.assets.json
 log  : Restored C:\ema_project.csproj (in 6.7 sec).
 
 C:\ema_project>
@@ -119,7 +115,7 @@ C:\ema_project>
 You can use ```dotnet list package``` to verify the EMA library package installation.
 
 ```bash
-C:\ema_project>dotnet list package
+root:/mnt/c/ema_project$ dotnet list package
 Project 'ema_project' has the following package references
    [net6.0]: 
    Top-level Package      Requested   Resolved
@@ -135,7 +131,7 @@ The next step is to changing the ```Program.cs``` file source code to call EMA l
 To handle ```.env``` file, we add the [DotNetEnv](https://www.nuget.org/packages/DotNetEnv) library to the project with the following command:
 
 ```bash
-C:\ema_project>dotnet add package DotNetEnv --version 3.0.0
+root:/mnt/c/ema_project$ dotnet add package DotNetEnv --version 3.0.0
 ```
 
 Then add a ```.env``` file to the ```ema_project``` folder with the following content:
@@ -145,7 +141,11 @@ CLIENT_ID=<Your Auth V Client-ID>
 CLIENT_SECRET=<Your Auth V Client-Secret>
 ```
 
-Now we come to the coding part. The first step is to adding the ```AppClient``` class to the ```Program.cs``` file. The ```AppClient``` class can be a simple class that print Refresh, Update, and Status messages as follows:
+Now we come to the coding part. You can open the project in VS Code editor by running the ```code .``` command inside the ```ema_project``` folder.
+
+![figure-2](images/03_ema_vscode_project.png "EMA Project in VS Code")
+
+The first step is to adding the ```AppClient``` class to the ```Program.cs``` file. The ```AppClient``` class can be a simple class that print Refresh, Update, and Status messages as follows:
 
 ```C#
 namespace ema_project;
@@ -288,22 +288,21 @@ Please note that the default configuration value is **Debug**.
 Example:
 
 ```bash
-C:\ema_project> dotnet build 
+root:/mnt/c/ema_project$ dotnet build
 MSBuild version 17.3.2+561848881 for .NET
   Determining projects to restore...
-  Restored C:\ema_project/ema_project.csproj (in 468 ms).
-  ema_project -> C:\ema_project/bin/Debug/net6.0/ema_project.dll
+  All projects are up-to-date for restore.
+  ema_project -> /mnt/c/ema_project/bin/Debug/net6.0/ema_project.dll
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:03.33
-C:\ema_project>
+Time Elapsed 00:00:02.44
 ```
-Then the generated executable ```dll``` and ```exe``` will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
+Then the generated executable ```dll``` (and ```exe``` if you are on Windows) will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
 
-![figure-3](images/03_ema_dotnet_build.png "dotnet build result")
+![figure-4](images/04_ema_dotnet_build.png "dotnet build result")
 
 Please keep in mind that the product of ```dotnet build``` **isn't ready to be transferred to another machine to run**. To create a version of the application that can be deployed, you need to publish it (for example, with the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command).
 
@@ -320,7 +319,7 @@ Please note that the ```dotnet run``` command automatically build the project us
 Example:
 
 ```bash
-C:\ema_project> dotnet run
+root:/mnt/c/ema_project$ dotnet run
 Connecting to market data server
 
 INFO|: loggerMsg
@@ -407,7 +406,7 @@ The ```dotnet run``` command is used in the context of projects, not built assem
 C:\ema_project\bin\Debug\net6.0> dotnet ema_project.dll
 ```
 
-Please note that when running a framework-dependent application DLL above, you need to copy all necessary files (like the EmaConfig.xml) to the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as well.
+Please note that when running a framework-dependent application DLL above, you need to copy all necessary files (like the EmaConfig.xml or .env file) to the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as well.
 
 For more detail about the run options, please check the [dotnet run document](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-run) page.
 
@@ -435,26 +434,24 @@ C:\ema_project>
 ```
 Result:
 
-![figure-4](images/04_ema_dotnet_publish_1.png "Publish a framework-dependent executable result")
+![figure-5](images/05_ema_dotnet_publish_1.png "Publish a framework-dependent executable result")
 
-Example: creates a self-contained executable for the Linux platform.
+Example: creates a self-contained executable for the Windows platform.
 
 ```bash
-# On Windows
+# On Linux
 
-C:\ema_project>dotnet publish --configuration Release --runtime linux-x64 --self-contained
-MSBuild version 17.5.0-preview-23061-01+040e2a90e for .NET
+root:/mnt/c/ema_project$ dotnet publish --configuration Release --runtime win-x64 --self-contained
+MSBuild version 17.3.2+561848881 for .NET
   Determining projects to restore...
-  Restored C:\ema_project\ema_project.csproj (in 3.04 sec).
-  ema_project -> C:\ema_project\bin\Release\net6.0\linux-x64\ema_project.dll
-  ema_project -> C:\ema_project\bin\Release\net6.0\linux-x64\publish\
-
-C:\ema_project>
+  Restored /mnt/c/ema_project/ema_project.csproj (in 648 ms).
+  ema_project -> /mnt/c/ema_project/bin/Release/net6.0/win-x64/ema_project.dll
+  ema_project -> /mnt/c/ema_project/bin/Release/net6.0/win-x64/publish/
 ```
 Result:
-![figure-5](images/05_ema_dotnet_publish_2.png "Publish a self-contained executable for Linux x64 result")
+![figure-6](images/06_ema_dotnet_publish_2.png "Publish a self-contained executable for Windows x64 result")
 
-Then you can copy a result directory with all dependencies files to deploy and run on your target machine using the ema_project binary file (based on your runtime, example ```$:/mnt/c/ema_project/bin/Release/net6.0/linux-x64/publish$ ./ema_project```).
+Then you can copy a result directory with all dependencies files to deploy and run on your target machine using the ema_project binary file (based on your runtime).
 
 To learn more about the publish and deployment options, please check the following resources:
 * [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) document.
@@ -463,15 +460,142 @@ To learn more about the publish and deployment options, please check the followi
 
 That all I have to say about creating the EMA .NET Project using VS Code.
 
+## Create the EMA API Real-Time Application Solution
+
+My next point is creating a solution. When you are doing a software development project, your application may needs multiple source code projects for easy management and implementation by multiple developers.  A Visual Studio solution is a container to organize one or more related projects.  When you open a solution, Visual Studio and Visual Studio Code automatically loads all the projects that the solution contains.
+
+### Initialize A Solution
+
+Firstly, create a new folder name ```ema_solution``` in your workbench environment.
+
+```bash
+$>mkdir ema_solution
+```
+
+Next, access the ```ema_solution``` and create a new console project with the following command:
+
+```bash
+dotnet new sln
+```
+Example result:
+
+```bash
+root:/mnt/c$cd ema_solution
+
+root:/mnt/c/ema_solution$ dotnet new sln
+The template "Solution File" was created successfully.
+```
+Our EMA Solution has 2 projects as follows:
+- A *JSONUtil* class library project that contains a POCO object for storing RIC data and transform the RIC data into a JSON message format
+- A EMA C# console project that connects and consume data from RTO, and print the market price data in JSON message format using a JSONUtil class library above.
+
+Let's start with a class library project. Firstly, create a new project inside ```ema_solution``` folder with the following dotnet CLI command.
+
+```bash
+dotnet new classlib -f net6.0 -o JSONUtil
+```
+Result:
+```bash
+root:/mnt/c/ema_solution$ dotnet new classlib -f net6.0 -o JSONUtil
+The template "Class Library" was created successfully.
+
+Processing post-creation actions...
+Running 'dotnet restore' on /mnt/c/ema_solution/JSONUtil/JSONUtil.csproj...
+  Determining projects to restore...
+  Restored /mnt/c/ema_solution/JSONUtil/JSONUtil.csproj (in 67 ms).
+Restore succeeded.
+```
+Next, add this JSONUtil project to solution with the following command
+
+```bash
+dotnet sln add JSONUtil/JSONUtil.csproj
+```
+Result:
+```bash
+Project `JSONUtil/JSONUtil.csproj` added to the solution.
+```
+
+This JSONUtil project uses [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json) package from the [NuGet](https://www.nuget.org/) platform for serialize/deserialize JSON data, so we add this package from NuGet to the project via the following command.
+
+```bash
+root:/mnt/c/ema_solution/JSONUtil$ dotnet add package Newtonsoft.Json --version 13.0.3
+```
+Once the package install succeed, open a solution with VS Code with the ```code .``` command in a ```ema_solution``` folder. The VS Code editor will be opened the EMA_SOLUTION solution like shown in the following image.
+
+![figure-7](images/07_ema_vscode_solution_1.png)
+
+Open a ```Class.cs``` file and add the following POCO code to the file.
+
+
+```C#
+namespace JSONUtil;
+
+using Newtonsoft.Json;
+
+public class RIC{
+   
+    public string Name {get; set;} = string.Empty;
+    public string ServiceName {get; set;} = string.Empty;
+    public double BID {get; set;}
+    public double ASK {get; set;}
+    public double NETCHNG_1 {get; set;}
+
+    public RIC() {}
+
+    public RIC(string ric, string serviceName, double bid = 0D, double ask = 0D, double netChange = 0D)
+    {
+        this.Name = ric;
+        this.ServiceName = serviceName;
+        this.BID = bid;
+        this.ASK = ask;
+        this.NETCHNG_1 = netChange;
+    }
+    public string ToJSON()
+    {
+        return JsonConvert.SerializeObject(this);
+    }
+}
+```
+
+This POCO code just store RIC information such as ```Name```, ```ServiceName```, and Market Data information ```BID```, ```ASK```, and ```NETCHNG_1``` fields data. It also contains a ```ToJSON()``` method that serialize self data from RIC object to JSON string message and sends that JSON string to a caller.
+
+You can build entire solution by running ```dotnet build``` command inside a ```ema_solution``` folder or build just  a ```JSONUtil``` project with a ```dotnet build``` command inside a ```ema_solution\JSONUtil``` folder.
+
+Example (build entire solution):
+
+```bash
+root:/mnt/c/ema_solution$ dotnet build
+MSBuild version 17.3.2+561848881 for .NET
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  JSONUtil -> /mnt/c/ema_solution/JSONUtil/bin/Debug/net6.0/JSONUtil.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.42
+```
+The next step is adding the EMAConsumer project.
+
+[tbd]
+
 ## A Solution
 1. dotnet new sln
-2. dotnet new console --framework net6.0 -o EMAConsumer --use-program-main
-3. dotnet sln add EMAConsumer/EMAConsumer.csproj
-4. cd EMAConsumer/
-5. dotnet add package LSEG.Ema.Core --version 3.1.0
+2. dotnet new classlib -f net6.0 -o JSONUtil
+3. dotnet sln add JSONUtil/JSONUtil.csproj
+4. cd JSONUtil/
+5. dotnet add package Newtonsoft.Json --version 13.0.3
 6. cd ..
-7. dotnet build
-8. dotnet run
+7. dotnet new console --framework net6.0 -o EMAConsumer --use-program-main
+8. dotnet sln add EMAConsumer/EMAConsumer.csproj
+9. dotnet add EMAConsumer/EMAConsumer.csproj reference JSONUtil/JSONUtil.csproj
+10. cd EMAConsumer/
+11. dotnet add package LSEG.Ema.Core --version 3.1.0
+12. dotnet add package DotNetEnv --version 3.0.0
+13. cd EMAConsumer/
+14. dotnet build
+15. dotnet run
 
 ## Docker
 1. docker build . -t dotnetema
@@ -483,4 +607,5 @@ That all I have to say about creating the EMA .NET Project using VS Code.
 3. https://hub.docker.com/_/microsoft-dotnet-sdk/
 4. https://hub.docker.com/_/microsoft-dotnet-runtime/
 5. https://www.nuget.org/packages/LSEG.Ema.Core 
-3. https://github.com/tonerdo/dotnet-env
+6. https://github.com/tonerdo/dotnet-env
+7. https://code.visualstudio.com/docs/csharp/project-management
