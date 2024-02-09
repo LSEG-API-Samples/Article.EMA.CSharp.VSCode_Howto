@@ -1,4 +1,12 @@
-﻿namespace EMAConsumer;
+﻿/*|-----------------------------------------------------------------------------
+ *|            This source code is provided under the Apache 2.0 license      --
+ *|  and is provided AS IS with no warranty or guarantee of fit for purpose.  --
+ *|                See the project's LICENSE.Md for details.                  --
+ *|           Copyright (C) 2024 LSEG. All rights reserved.                   --
+ *|-----------------------------------------------------------------------------
+ */
+
+namespace EMAConsumer;
 using JSONUtil;
 using System;
 using System.IO;
@@ -132,9 +140,9 @@ class Program
                 FixedWidth = 2
             };
 
-            array.AddInt(11)
-                .AddInt(22)
-				.AddInt(25)
+            array.AddInt(11) //NETCHNG_1
+                .AddInt(22) //BID
+				.AddInt(25) //ASK
 				.Complete();
             
             var view = new ElementList()

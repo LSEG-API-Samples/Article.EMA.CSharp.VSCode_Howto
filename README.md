@@ -26,7 +26,9 @@ Firstly, you need .NET 6 SDK. You can download the SDK based on your system from
 
 ### Visual Studio Code
 
-Next, the [VS Code](https://code.visualstudio.com/) editor tool.
+Next, the [VS Code](https://code.visualstudio.com/) editor tool with the free [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp).
+
+**Note**: There is also the [C# Dev Kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) that gives developers more "Visual Studio like" experience and features than the C# extension. However, the C# Dev Kit extension requires Visual Studio License.
 
 ### Access to the RTO
 
@@ -128,7 +130,7 @@ Now the ema_project is ready for implementing the real-time application with EMA
 
 The next step is to changing the ```Program.cs``` file source code to call EMA library to connect and consume data from RTO.
 
-To handle ```.env``` file, we add the [DotNetEnv](https://www.nuget.org/packages/DotNetEnv) library to the project with the following command:
+To handle ```.env``` file, we add the DotNetEnv library to the project with the following command:
 
 ```bash
 root:/mnt/c/ema_project$ dotnet add package DotNetEnv --version 3.0.0
@@ -576,7 +578,237 @@ Build succeeded.
 
 Time Elapsed 00:00:02.42
 ```
-The next step is adding the EMAConsumer project.
+The next step is adding the EMAConsumer project. Please go back to the ```ema_solution``` folder and add new EMA console application project with the following command:
+
+```bash
+dotnet new console --framework net6.0 -o EMAConsumer --use-program-main
+```
+Next, add this EMAConsumer project to solution with the following command
+
+```bash
+dotnet sln add EMAConsumer/EMAConsumer.csproj
+```
+
+The newly created EMAConsumer project does not have access to the JSONUtil class library project, so we need to add a project reference to the JSONUtil project with the following command.
+
+```bash
+dotnet add EMAConsumer/EMAConsumer.csproj reference JSONUtil/JSONUtil.csproj
+```
+Example:
+
+```bash
+root:/mnt/c/ema_solution$ dotnet add EMAConsumer/EMAConsumer.csproj reference JSONUtil/JSONUtil.csproj
+Reference `..\JSONUtil\JSONUtil.csproj` added to the project.
+root:/mnt/c/ema_solution$ 
+```
+
+Now we are ready to add the [EMA](https://www.nuget.org/packages/LSEG.Ema.Core) and [DotNetEnv](https://www.nuget.org/packages/DotNetEnv) packages into the EMAConsumer project. Please go to the ```ema_solution\EMAConsumer```  and run the following command.
+
+```bash
+dotnet add package LSEG.Ema.Core --version 3.1.0
+
+dotnet add package DotNetEnv --version 3.0.0
+```
+
+Once the EMAConsumer project is finished setup, the VS Code workspace contains both projects that you can develop in the same editor.
+
+![figure-8](images/08_ema_vscode_solution_2.png "EMAConsumer and JSONUtil projects in VS Code solution")
+
+
+### Add the Real-Time Application Source Code with EMA
+
+The next step is to changing the ```Program.cs``` file source code to call EMA API interfaces and JSONUtil library to consume data from RTO and print that data as JSON message format.
+
+Firstly, add a ```.env``` file to the ```ema_solution/EMAConsumer``` folder with the following content:
+
+```ini
+CLIENT_ID=<Your Auth V Client-ID>
+CLIENT_SECRET=<Your Auth V Client-Secret>
+```
+
+Secondly, open the ```EMAConsumer/Program.cs``` file and add the following library import to the file header.
+
+
+```C#
+namespace EMAConsumer;
+using JSONUtil;
+using System;
+using System.IO;
+using System.Threading;
+using LSEG.Ema.Access;
+using LSEG.Ema.Domain.Login;
+using static LSEG.Ema.Access.DataType;
+using LSEG.Ema.Rdm;
+using DotNetEnv;
+
+class Program
+{
+    ...
+}
+```
+
+Next, modify the ```main()``` function to call the EMA API interfaces as follows:
+
+```C#
+class Program
+{
+    static void Main(string[] args)
+    {
+
+        string RicName = "THB=";
+        string ServiceName = "ELEKTRON_DD";
+        RIC ric = new RIC(RicName,ServiceName);
+
+        DotNetEnv.Env.Load();
+        OmmConsumer? consumer = null;
+        try{
+            // instantiate callback client
+            AppClient appClient = new();
+            appClient.SetRicObj(ric);
+            Console.WriteLine("Connecting to market data server");
+
+            string clientID = Environment.GetEnvironmentVariable("CLIENT_ID") ?? "<Client_ID>";
+            string clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? "<Client_Secret>";
+            OmmConsumerConfig config = new OmmConsumerConfig().ClientId(clientID).ClientSecret(clientSecret);
+            // create OMM consumer
+            consumer = new OmmConsumer(config);
+
+            Console.WriteLine("Subscribing to market data");
+
+            LoginReq loginReq = new();
+			consumer.RegisterClient(loginReq.Message(), appClient);
+
+            OmmArray array = new()
+            {
+                FixedWidth = 2
+            };
+
+            array.AddInt(11) //NETCHNG_1
+                .AddInt(22) //BID
+				.AddInt(25) //ASK
+				.Complete();
+            
+            var view = new ElementList()
+				.AddUInt(EmaRdm.ENAME_VIEW_TYPE, 1)
+				.AddArray(EmaRdm.ENAME_VIEW_DATA, array)
+				.Complete();
+            
+            RequestMsg reqMsg = new();
+
+            consumer.RegisterClient(reqMsg.ServiceName(ServiceName).Name(RicName).Payload(view), appClient);
+            Thread.Sleep(60000); // 
+
+        }catch (OmmException excp){
+            Console.WriteLine($"Exception subscribing to market data: {excp.Message}");
+        }
+        finally
+        {
+             consumer?.Uninitialize();
+        }
+    }
+}
+```
+
+The code above perform the following tasks:
+1. Create JSONUtil's ```RIC``` object.
+2. Create ```AppClient``` object and pass a ```RIC``` object to ```AppClient``` for storing data from the API.
+3. Create a ```OmmConsumerConfig``` with the RTO Authentication Version 2 credential.
+4. Register the Login stream.
+5. Create a View request message that subscribes for *NETCHNG_1*, *BID*, and *ASK* fields, then subscribes item.
+
+์Now we come to the ```AppClient``` class path that needs to get a ```RIC``` object from the main class, update ```RIC``` object data with incoming data via the ```OnRefreshMsg``` and ```OnUpdateMsg``` callback methods and call ```RIC.ToJSON()``` method to print out incoming data as a JSON message.
+
+```C#
+namespace EMAConsumer;
+
+using JSONUtil;
+....
+
+internal class AppClient: IOmmConsumerClient
+{
+    RIC _ric;
+    private readonly LoginRefresh _loginRefresh = new();
+    private readonly LoginStatus _loginStatus = new();
+
+    public void SetRicObj(RIC ric)
+    {
+        this._ric = ric;
+    }
+    public void OnRefreshMsg(RefreshMsg refreshMsg, IOmmConsumerEvent consumerEvent)
+    {
+
+        Console.WriteLine("Refresh Message");
+        if(refreshMsg.DomainType() == EmaRdm.MMT_LOGIN)
+        {
+            _loginRefresh.Clear();
+            Console.WriteLine(_loginRefresh.Message(refreshMsg).ToString());
+        } else
+        {
+            if (DataType.DataTypes.FIELD_LIST == refreshMsg.Payload().DataType)
+			    Decode(refreshMsg.Payload().FieldList());
+
+            Console.WriteLine(_ric.ToJSON());
+        }
+
+		Console.WriteLine();
+    }
+    public void OnUpdateMsg(UpdateMsg updateMsg, IOmmConsumerEvent consumerEvent)
+    {
+        Console.WriteLine("Update Message");
+		if (DataTypes.FIELD_LIST == updateMsg.Payload().DataType)
+			Decode(updateMsg.Payload().FieldList());
+		
+        Console.WriteLine(_ric.ToJSON());
+		Console.WriteLine();
+    }
+    public void OnStatusMsg(StatusMsg statusMsg, IOmmConsumerEvent consumerEvent)
+    {
+    ...
+    }
+}
+
+```
+Moving on the the ```Decode``` method that iterates incoming FieldList message and updates a ```RIC``` object's *NETCHNG_1*, *BID*, and *ASK* properties.  
+
+```C#
+internal class AppClient: IOmmConsumerClient
+{
+    ...
+    void Decode(FieldList fieldList)
+    {
+        foreach (var fieldEntry in fieldList)
+        {
+            var FieldName = fieldEntry.Name;
+            _ric.GetType().GetProperty(FieldName).SetValue(_ric, Decode(fieldEntry));
+        }
+    }
+
+    double Decode(FieldEntry fieldEntry)
+    {
+        double ReturnValue = 0D;
+        if (Data.DataCode.BLANK == fieldEntry.Code)
+        {
+            return ReturnValue;
+        }
+        else
+        {
+            switch (fieldEntry.LoadType)
+            {
+                case DataTypes.REAL:
+                    ReturnValue = fieldEntry.OmmRealValue().AsDouble();
+                    break;
+                default:
+                    ReturnValue = 0D;
+                    break;
+            }
+        }
+        return ReturnValue;
+    }
+}
+```
+The final step is to create the ```EmaConfig.xml``` file with the configurations like the ```ema_project``` above to configure the API to connect to RTO endpoint.
+
+Unlike the Visual Studio IDE that you can set a default project with the solution. With VS Code (and .NET CLI), you need to 
 
 [tbd]
 
