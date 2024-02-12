@@ -491,6 +491,8 @@ Our EMA Solution has 2 projects as follows:
 - A *JSONUtil* class library project that contains a POCO object for storing RIC data and transform the RIC data into a JSON message format
 - A EMA C# console project that connects and consume data from RTO, and print the market price data in JSON message format using a JSONUtil class library above.
 
+### Initialize A Class Library Project
+
 Let's start with a class library project. Firstly, create a new project inside ```ema_solution``` folder with the following dotnet CLI command.
 
 ```bash
@@ -522,6 +524,8 @@ This JSONUtil project uses [Newtonsoft.Json](https://www.nuget.org/packages/Newt
 ```bash
 root:/mnt/c/ema_solution/JSONUtil$ dotnet add package Newtonsoft.Json --version 13.0.3
 ```
+### Add the Class Library Source Code
+
 Once the package install succeed, open a solution with VS Code with the ```code .``` command in a ```ema_solution``` folder. The VS Code editor will be opened the EMA_SOLUTION solution like shown in the following image.
 
 ![figure-7](images/07_ema_vscode_solution_1.png)
@@ -578,6 +582,8 @@ Build succeeded.
 
 Time Elapsed 00:00:02.42
 ```
+### Initialize A EMA API Project
+
 The next step is adding the EMAConsumer project. Please go back to the ```ema_solution``` folder and add new EMA console application project with the following command:
 
 ```bash
@@ -808,30 +814,111 @@ internal class AppClient: IOmmConsumerClient
 ```
 The final step is to create the ```EmaConfig.xml``` file with the configurations like the ```ema_project``` above to configure the API to connect to RTO endpoint.
 
-Unlike the Visual Studio IDE that you can set a default project with the solution. With VS Code (and .NET CLI), you need to 
+### Build and Run Real-Time Application Solution
 
-[tbd]
+You can build entire solution by running the ```dotnet build``` command in the ```ema_solution``` folder or build only this EMAConsumer project by running the ```dotnet build``` command in the  ```ema_solution\EMAConsumer``` folder.
 
-## A Solution
-1. dotnet new sln
-2. dotnet new classlib -f net6.0 -o JSONUtil
-3. dotnet sln add JSONUtil/JSONUtil.csproj
-4. cd JSONUtil/
-5. dotnet add package Newtonsoft.Json --version 13.0.3
-6. cd ..
-7. dotnet new console --framework net6.0 -o EMAConsumer --use-program-main
-8. dotnet sln add EMAConsumer/EMAConsumer.csproj
-9. dotnet add EMAConsumer/EMAConsumer.csproj reference JSONUtil/JSONUtil.csproj
-10. cd EMAConsumer/
-11. dotnet add package LSEG.Ema.Core --version 3.1.0
-12. dotnet add package DotNetEnv --version 3.0.0
-13. cd EMAConsumer/
-14. dotnet build
-15. dotnet run
+Example: Build entire solution
 
+```bash
+root:/mnt/c/ema_solution$ dotnet build
+MSBuild version 17.3.2+561848881 for .NET
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  JSONUtil -> /mnt/c/ema_solution/JSONUtil/bin/Debug/net6.0/JSONUtil.dll
+  EMAConsumer -> /mnt/c/ema_solution/EMAConsumer/bin/Debug/net6.0/EMAConsumer.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.17
+```
+
+Unlike the Visual Studio IDE that you can set a solution default project and click the "Run" button on the IDE. With VS Code (and .NET CLI), you need to run the project in side a project folder using the ```dotnet run``` command or with ```dotnet run --project &lt;project/project.csproj&gt;``` (All required runtime file must be located on the solution home folder).
+
+Run Result: Run inside the EMAConsumer project folder.
+
+```bash
+root:/mnt/c/ema_solution$ cd EMAConsumer/
+root:/mnt/c/ema_solution/EMAConsumer$ dotnet run
+Connecting to market data server
+
+INFO|: loggerMsg
+    ClientName: ChannelCallbackClient
+    Severity: Info    Text:    Received ChannelUp event on channel Channel_4
+        Instance Name Consumer_4_1
+        Component Version ads3.7.0.E4.linux.rrg 64-bit
+loggerMsgEnd
+Subscribing to market data
+Refresh Message
+
+AllowSuspectData : True
+ApplicationId : 256
+ApplicationName : RTO
+...
+UserNameType : 1
+State : StreamState: 1 DataState: 1 StatusCode: 0 StatusText: Login accepted by host ads-fanout-sm-az2-apse1-prd.
+
+Refresh Message
+{"NETCHNG_1":-0.08,"BID":149.22,"ASK":149.24,"Name":"JPY=","ServiceName":"ELEKTRON_DD"}
+
+Update Message
+{"NETCHNG_1":-0.08,"BID":149.22,"ASK":149.23,"Name":"JPY=","ServiceName":"ELEKTRON_DD"}
+
+Update Message
+{"NETCHNG_1":-0.09,"BID":149.21,"ASK":149.24,"Name":"JPY=","ServiceName":"ELEKTRON_DD"}
+
+Update Message
+{"NETCHNG_1":-0.08,"BID":149.22,"ASK":149.23,"Name":"JPY=","ServiceName":"ELEKTRON_DD"}
+
+Update Message
+{"NETCHNG_1":-0.09,"BID":149.21,"ASK":149.24,"Name":"JPY=","ServiceName":"ELEKTRON_DD"}
+...
+```
+
+### Publishing the Solution
+
+You can publish the solution using the ```dotnet publish``` like the project by specify the the path and filename of a solution file (.sln extension) after the command. 
+
+Example:
+```bash
+dotnet publish ./ema_solution.sln 
+```
+
+All [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command arguments are supported in the solution level too.
+
+Example: creates a self-contained executable for the Windows platform.
+
+```bash
+root:/mnt/c/ema_solution$ dotnet publish ./ema_solution.sln --configuration Release --runtime win-x64 --self-contained
+MSBuild version 17.3.2+561848881 for .NET
+  Determining projects to restore...
+  Restored /mnt/c/ema_solution/JSONUtil/JSONUtil.csproj (in 361 ms).
+  Restored /mnt/c/ema_solution/EMAConsumer/EMAConsumer.csproj (in 731 ms).
+  JSONUtil -> /mnt/c/ema_solution/JSONUtil/bin/Release/net6.0/JSONUtil.dll
+  JSONUtil -> /mnt/c/ema_solution/JSONUtil/bin/Release/net6.0/win-x64/JSONUtil.dll
+  ...
+  EMAConsumer -> /mnt/c/ema_solution/EMAConsumer/bin/Release/net6.0/win-x64/EMAConsumer.dll
+  JSONUtil -> /mnt/c/ema_solution/JSONUtil/bin/Release/net6.0/win-x64/publish/
+  EMAConsumer -> /mnt/c/ema_solution/EMAConsumer/bin/Release/net6.0/win-x64/publish/
+```
+
+The publish result will be available inside each Project' */bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder like the following example of the Class Library project. 
+
+![figure-9](images/09_ema_publish_proj_1.png "JSONUtil project publish result")
+
+About the EMAConsumer, the publish result also contains the JSONUtil class library's dll file because we have added a project reference to the JSONUtil project.
+
+![figure-10](images/10_ema_publish_proj_2.png "EMAConsumer project publish result")
+
+That covers the EMA Solution project with VS Code.
+
+<!--
 ## Docker
 1. docker build . -t dotnetema
 2. docker run -it --name dotnetema dotnetema
+-->
 
 # Links
 1. https://learn.microsoft.com/en-us/dotnet/core/tutorials/library-with-visual-studio-code?pivots=dotnet-6-0

@@ -112,7 +112,7 @@ class Program
     static void Main(string[] args)
     {
 
-        string RicName = "THB=";
+        string RicName = "JPY=";
         string ServiceName = "ELEKTRON_DD";
         RIC ric = new RIC(RicName,ServiceName);
 
