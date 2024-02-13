@@ -24,11 +24,15 @@ Before I am going further, there is some prerequisite, dependencies, and librari
 
 Firstly, you need .NET 6 SDK. You can download the SDK based on your system from [Microsoft .NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) website.
 
+Please check [How to check that .NET is already installed](https://learn.microsoft.com/en-us/dotnet/core/install/how-to-detect-installed-versions) to verify installed .NET versions on your machine.
+
 ### Visual Studio Code
 
 Next, the [VS Code](https://code.visualstudio.com/) editor tool with the free [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp).
 
-**Note**: There is also the [C# Dev Kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) that gives developers more "Visual Studio like" experience and features than the C# extension. However, the C# Dev Kit extension requires Visual Studio License.
+**Note**: 
+1. There is also the [C# Dev Kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) that gives developers more "Visual Studio like" experience and features than the C# extension. However, the C# Dev Kit extension requires Visual Studio License.
+2. The C# extension requires [.NET 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0), but you can setup and compile .NET 6.0 project with the .NET 7.0 SDK.
 
 ### Access to the RTO
 
@@ -920,11 +924,25 @@ That covers the EMA Solution project with VS Code.
 2. docker run -it --name dotnetema dotnetema
 -->
 
+## <a href="summary">Conclusion and Next Steps
+
+The RTSDK C# give developers access to the LSEG Real-Time platform's real-time streaming data with both low-level and high-levels APIs interfaces for every developers' requirements. For ultra-high performance applications, there is the ETA API that provides high performance, low latency, and open source low-level API interfaces for developers. For the majority of use cases, there is the ease-of-use EMA API with high-level API interfaces for developers. The C# edition SDK supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) which makes the SDK supports various types of development environments like the full-feature Visual Studio 2022 IDE, or the [.NET CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) with any editors on the supported platforms.
+
+[Visual Studio Code](https://code.visualstudio.com/) (or just VSCode) is a free, cross-platform source code editor that took over developers' popularity based on its fast and lightweight, supports a variety of programming languages with IntelliSense, and has complete development operations like debugging, task running, and version control. With the the free [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp), the VS Code can do basic development tasks with .NET development including the EMA and ETA APIs using the editor tool or the .NET CLI.
+
+
+
+
+
 # Links
-1. https://learn.microsoft.com/en-us/dotnet/core/tutorials/library-with-visual-studio-code?pivots=dotnet-6-0
-2. https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-7-0
-3. https://hub.docker.com/_/microsoft-dotnet-sdk/
-4. https://hub.docker.com/_/microsoft-dotnet-runtime/
-5. https://www.nuget.org/packages/LSEG.Ema.Core 
-6. https://github.com/tonerdo/dotnet-env
-7. https://code.visualstudio.com/docs/csharp/project-management
+* https://learn.microsoft.com/en-us/dotnet/core/tutorials/with-visual-studio-code?pivots=dotnet-6-0
+* https://learn.microsoft.com/en-us/dotnet/core/tutorials/library-with-visual-studio-code?pivots=dotnet-6-0
+* https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-7-0
+* https://code.visualstudio.com/docs/languages/dotnet#_setting-up-vs-code-for-net-development
+* https://hub.docker.com/_/microsoft-dotnet-sdk/
+* https://hub.docker.com/_/microsoft-dotnet-runtime/
+* https://www.nuget.org/packages/LSEG.Ema.Core 
+* https://github.com/tonerdo/dotnet-env
+* https://code.visualstudio.com/docs/csharp/project-management
+* https://softchris.github.io/pages/dotnet-core.html#update-our-library-code
+* https://code.visualstudio.com/docs/languages/dotnet#_setting-up-vs-code-for-net-development
