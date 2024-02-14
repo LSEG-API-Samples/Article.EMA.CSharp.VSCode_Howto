@@ -926,23 +926,33 @@ That covers the EMA Solution project with VS Code.
 
 ## <a href="summary">Conclusion and Next Steps
 
-The RTSDK C# give developers access to the LSEG Real-Time platform's real-time streaming data with both low-level and high-levels APIs interfaces for every developers' requirements. For ultra-high performance applications, there is the ETA API that provides high performance, low latency, and open source low-level API interfaces for developers. For the majority of use cases, there is the ease-of-use EMA API with high-level API interfaces for developers. The C# edition SDK supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) which makes the SDK supports various types of development environments like the full-feature Visual Studio 2022 IDE, or the [.NET CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) with any editors on the supported platforms.
+Before I finish, let me just say the RTSDK C# give developers access to the LSEG Real-Time platform's real-time streaming data with both low-level and high-levels APIs interfaces for every developers' requirements. For ultra-high performance applications, there is the ETA API that provides high performance, low latency, and open source low-level API interfaces for developers. For the majority of use cases, there is the ease-of-use EMA API with high-level API interfaces for developers. The C# edition SDK supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) which makes the application can be developed on various types of development environments such as the full-feature Visual Studio 2022 IDE on Windows, or the [.NET CLI tool](https://learn.microsoft.com/en-us/dotnet/core/tools/) with any editors on the supported platforms.
 
-[Visual Studio Code](https://code.visualstudio.com/) (or just VSCode) is a free, cross-platform source code editor that took over developers' popularity based on its fast and lightweight, supports a variety of programming languages with IntelliSense, and has complete development operations like debugging, task running, and version control. With the the free [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp), the VS Code can do basic development tasks with .NET development including the EMA and ETA APIs using the editor tool or the .NET CLI.
+[Visual Studio Code](https://code.visualstudio.com/) (or just VSCode) is a free, cross-platform source code editor that took over developers' popularity based on its fast and lightweight, supports a variety of programming languages with IntelliSense, and has complete development operations like debugging, task running, and version control. With the the free [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp), the VS Code can do basic development tasks with .NET development including the RTSDK C# APIs using the editor with the .NET CLI tool. The combination of the VS Code C# extension and .NET CLI tool make they suitable for developing the real-time applications on non-Windows platforms, or even on Windows for developers who do not have the Visual Studio Professional/Enterprise subscriptions. 
+
+If you want more powerful development feature on VS Code for the RTSDK C# edition, there is the [C# Dev kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) that gives you the development experience much closer to the full feature Visual Studio IDE while maintain its lightweight and supports all major OS platforms. However, the C# Dev kit extension requires the Visual Studio Professional or Enterprise subscriptions license.
+
+That’s all I have to say about the RTSDK C# development with VS Code.
+
+## <a id="ref"></a>References
+
+For further details, please check out the following resources:
+* [Real-Time SDK V# page](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) on the [LSEG Developer Community](https://developers.lseg.com/) website.
+* [Real-Time SDK Family](https://developers.lseg.com/en/use-cases-catalog/refinitiv-real-time) page.
+* [Real-Time SDK C# Quick Start](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk/quick-start).
+* [Developer Article: 10 important things you need to know before you write an Enterprise Real Time application](https://developers.lseg.com/article/10-important-things-you-need-know-you-write-elektron-real-time-application).
+* [Changes to Customer Access and Identity Management: Refinitiv Real-Time - Optimized](https://developers.lseg.com/en/article-catalog/article/changes-to-customer-access-and-identity-management--refinitiv-re).
+* [EMA C# API Library on NuGet](https://www.nuget.org/packages/LSEG.Ema.Core ) platform.
+* [.NET SDK](https://learn.microsoft.com/en-us/dotnet/core/sdk) page.
+* [Tutorial: Create a .NET console application using Visual Studio Code](https://learn.microsoft.com/en-us/dotnet/core/tutorials/with-visual-studio-code?pivots=dotnet-6-0).
+* [Tutorial: Create a .NET class library using Visual Studio Code](https://learn.microsoft.com/en-us/dotnet/core/tutorials/library-with-visual-studio-code?pivots=dotnet-6-0).
+* [Setting up VS Code for .NET development](https://code.visualstudio.com/docs/languages/dotnet#_setting-up-vs-code-for-net-development) page.
+* [Getting Started with C# in VS Code](https://code.visualstudio.com/docs/csharp/get-started) document.
+* [How YOU can get started with .NET Core and C# in VS Code](https://softchris.github.io/pages/dotnet-core.html#update-our-library-code) blog post.
+* [Tutorial: Containerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-7-0).
+* [.NET SDK on DockerHub](https://hub.docker.com/_/microsoft-dotnet-sdk/) platform.
+* [.NET Runtime on DockerHub](https://hub.docker.com/_/microsoft-dotnet-runtime/) platform.
+
+For any question related to this article or the RTSDK page, please use the Developer Community [Q&A Forum](https://community.developers.refinitiv.com/).
 
 
-
-
-
-# Links
-* https://learn.microsoft.com/en-us/dotnet/core/tutorials/with-visual-studio-code?pivots=dotnet-6-0
-* https://learn.microsoft.com/en-us/dotnet/core/tutorials/library-with-visual-studio-code?pivots=dotnet-6-0
-* https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-7-0
-* https://code.visualstudio.com/docs/languages/dotnet#_setting-up-vs-code-for-net-development
-* https://hub.docker.com/_/microsoft-dotnet-sdk/
-* https://hub.docker.com/_/microsoft-dotnet-runtime/
-* https://www.nuget.org/packages/LSEG.Ema.Core 
-* https://github.com/tonerdo/dotnet-env
-* https://code.visualstudio.com/docs/csharp/project-management
-* https://softchris.github.io/pages/dotnet-core.html#update-our-library-code
-* https://code.visualstudio.com/docs/languages/dotnet#_setting-up-vs-code-for-net-development
