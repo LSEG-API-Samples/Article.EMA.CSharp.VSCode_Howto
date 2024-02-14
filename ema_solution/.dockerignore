@@ -1,0 +1,6 @@
+EMAConsumer/bin/
+EMAConsumer/obj/
+EMAConsumer/.env
+EMAConsumer/.env.example
+JSONUtil/bin/
+JSONUtil/obj/

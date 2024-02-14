@@ -897,5 +897,5 @@ That covers the EMA Solution creation with VS Code.
 <!--
 ## Docker
 1. docker build . -t dotnetema
-2. docker run -it --name dotnetema --env-file .env dotnetema
+2. docker run -it --name dotnetema --env-file EMAConsumer/.env dotnetema
 -->
