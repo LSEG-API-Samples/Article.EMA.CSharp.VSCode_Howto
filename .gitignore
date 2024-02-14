@@ -1,11 +1,7 @@
-bin/
-obj/
 ema_project/obj
 ema_project/bin
 ema_project/.env
-่json_project/
 note.txt
-json_solution/
 ema_solution/EMAConsumer/.env
 ema_solution/EMAConsumer/bin
 ema_solution/EMAConsumer/obj

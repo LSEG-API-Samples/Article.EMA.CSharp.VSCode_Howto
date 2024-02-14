@@ -18,4 +18,5 @@ FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION}-${VARIANT} as release
 # Create app directory
 WORKDIR /App
 COPY --from=builder /App/out .
-ENTRYPOINT ["dotnet", "EMA_dotnet_vscode.dll"]
+COPY EmaConfig.xml .
+ENTRYPOINT ["dotnet","ema_project.dll"]

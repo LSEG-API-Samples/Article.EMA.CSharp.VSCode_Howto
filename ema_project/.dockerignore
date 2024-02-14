@@ -1,0 +1,4 @@
+bin/
+obj/
+.env
+.env.example
