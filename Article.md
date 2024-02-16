@@ -44,7 +44,7 @@ The ```dotnet new console --framework net6.0 --use-program-main``` command creat
 
 ![figure-1](images/01_emaproj_folder.png "dotnet new project command result")
 
-We can test our project creation and .NET SDK setup verification by running this ```Program.cs``` with the following command:
+We can test our project creation and .NET SDK setup verification by running this ```Program.cs``` with the following command in a terminal:
 
 ```bash
 dotnet run
@@ -79,11 +79,9 @@ info :   OK https://api.nuget.org/v3-flatcontainer/lseg.ema.core/3.1.0/lseg.ema.
 info : Package 'LSEG.Ema.Core' is compatible with all the specified frameworks in project '/mnt/c/ema_project/ema_project.csproj'.
 info : PackageReference for package 'LSEG.Ema.Core' version '3.1.0' added to file '/mnt/c/ema_project/ema_project.csproj'.
 info : Writing assets file to disk. Path:  /mnt/c/ema_project/obj/project.assets.json
-log  : Restored C:\ema_project.csproj (in 6.7 sec).
-
-C:\ema_project>
+log  : Restored /mnt/c/ema_project (in 6.7 sec).
 ```
-You can use ```dotnet list package``` to verify the EMA library package installation.
+You can use ```dotnet list package``` command to verify the EMA library package installation.
 
 ```bash
 root:/mnt/c/ema_project$ dotnet list package
@@ -99,13 +97,13 @@ Now the ema_project is ready for implementing the real-time application with EMA
 
 So, now let’s look at the real-time application source code. The next step is to changing the ```Program.cs``` file source code to call EMA library to connect and consume data from RTO.
 
-To handle ```.env``` file that store you RTO Authentication version 2 credential, we add the *DotNetEnv library* to the project with the following command:
+To handle a ```.env``` file that store you RTO Authentication version 2 credential, we add the *DotNetEnv library* to the project with the following command:
 
 ```bash
 root:/mnt/c/ema_project$ dotnet add package DotNetEnv --version 3.0.0
 ```
 
-Then add a ```.env``` file to the ```ema_project``` folder with the following content:
+Then add a ```.env``` file to the ```ema_project``` folder with the following Authentication Version 2 content:
 
 ```ini
 CLIENT_ID=<Your Auth V2 Client-ID>
@@ -155,6 +153,7 @@ class Program
 Moving on the the ```Program``` class that act as the Consumer:
 
 ```C#
+//Program.cs
 internal class AppClient: IOmmConsumerClient
 {
   ...
@@ -196,7 +195,7 @@ class Program
 }
 ```
 
-The final step is to create the ```EmaConfig.xml``` file with the configurations based on this [Enterprise Message API (EMA) - Configuration Overview](https://developers.lseg.com/en/article-catalog/article/elektron-message-api-ema-configuration-overview) article. The main point is set the ```Channel``` to connect to RTO.
+The final step is to create the ```EmaConfig.xml``` file with the configurations based on this [Enterprise Message API (EMA) - Configuration Overview](https://developers.lseg.com/en/article-catalog/article/elektron-message-api-ema-configuration-overview) article. The main point is set the ```Channel``` configuration to connect to RTO.
 
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -240,16 +239,11 @@ The final step is to create the ```EmaConfig.xml``` file with the configurations
 ...
 </EmaConfig>
 ```
+That covers the coding part of the project.
 
 ### <a href="build_run_app_project"></a>Build and Run Real-Time Application Source Code
 
 That brings us to build and run our source code step we just created. To build the project, we use the [dotnet build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) command inside the ```ema_project``` folder.
-
-```bash
-dotnet build
-```
-
-Or 
 
 ```bash
 dotnet build --configuration {Debug or Release}
@@ -271,11 +265,11 @@ Build succeeded.
 
 Time Elapsed 00:00:02.44
 ```
-Then the generated executable ```dll``` (and ```exe``` if you are on Windows) will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
+Then the generated executable ```project_name.dll``` files (and ```project_name.exe``` files if you are on Windows) will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
 
 ![figure-4](images/04_ema_dotnet_build.png "dotnet build result")
 
-Please keep in mind that the product of ```dotnet build``` **isn't ready to be transferred to another machine to run**. To create a version of the application that can be deployed, you need to publish it (for example, with the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command).
+Please keep in mind that the product of ```dotnet build``` command **isn't ready to be transferred to another machine to run**. To create a version of the application that can be deployed, you need to publish it (for example, with the [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command).
 
 For more detail about the dotnet build command options, please check the [dotnet build document](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) page.
 
@@ -285,7 +279,7 @@ Next, we come to the [dotnet run](https://learn.microsoft.com/en-us/dotnet/core/
 dotnet run
 ```
 
-Please note that the ```dotnet run``` command automatically build the project using ```dotnet build``` if necessary. 
+Please note that the ```dotnet run``` command automatically build the project using ```dotnet build``` command if necessary. 
 
 Example:
 
@@ -374,7 +368,7 @@ UpdateMsgEnd
 The ```dotnet run``` command is used in the context of projects, not built assemblies. If you're trying to run a framework-dependent application DLL instead, you must use dotnet without a command inside *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder like the following example:
 
 ```bash
-C:\ema_project\bin\Debug\net6.0> dotnet ema_project.dll
+/mnt/c/ema_project/bin/Debug/net6.0/$ dotnet ema_project.dll
 ```
 
 Please note that when running a framework-dependent application DLL above, you need to copy all necessary files (like the EmaConfig.xml or .env file) to the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as well.
@@ -385,7 +379,7 @@ Let’s leave the build and run step there.
 
 ### <a id="publish_project"></a>Publishing the Project
 
-Now let me turn to how to publish our project. The ```dotnet publish ``` compiles the application, reads through its dependencies specified in the project file, and publishes the resulting set of files to a directory (containing dll, configuration json files, dependencies files, etc). The command output is ready for deployment to a hosting system for execution.  You can publish the .NET application in 2 modes as follows:
+Now let me turn to how to publish our project. The ```dotnet publish``` command compiles the application, reads through its dependencies specified in the project file, and publishes the resulting set of files to a directory (containing dll, configuration json files, dependencies files, etc). The command output is ready for deployment to a hosting system for execution.  You can publish the .NET application in 2 modes as follows:
 - *self-contained* mode: This mode produces an application that includes the .NET runtime and libraries, and your application and its dependencies. Users of the application can run it on a machine that doesn't have the .NET runtime installed.
 - *framework-dependent*: This mode produces an application that includes only your application itself and its dependencies. Users of the application have to separately install the .NET runtime.
 
@@ -394,16 +388,14 @@ Please note that both publishing modes produce a platform-specific executable by
 Example: creates a framework-dependent executable for the current platform.
 
 ```bash
-# On Windows
+#On Linux 
 
-C:\ema_project>dotnet publish
-MSBuild version 17.5.0-preview-23061-01+040e2a90e for .NET
+root:/mnt/c/ema_project$ dotnet publish
+MSBuild version 17.7.4+3ebbd7c49 for .NET
   Determining projects to restore...
-  Restored C:\ema_project\ema_project.csproj (in 1.82 sec).
-  ema_project -> C:\ema_project\bin\Debug\net6.0\ema_project.dll    
-  ema_project -> C:\ema_project\bin\Debug\net6.0\publish\
-
-C:\ema_project>
+  Restored /mnt/c/ema_project/ema_project.csproj (in 708 ms).
+  ema_project -> /mnt/c/ema_project/bin/Debug/net6.0/ema_project.dll
+  ema_project -> /mnt/c/ema_project/bin/Debug/net6.0/publish/
 ```
 Result:
 
@@ -422,6 +414,7 @@ MSBuild version 17.3.2+561848881 for .NET
   ema_project -> /mnt/c/ema_project/bin/Release/net6.0/win-x64/publish/
 ```
 Result:
+
 ![figure-6](images/06_ema_dotnet_publish_2.png "Publish a self-contained executable for Windows x64 result")
 
 Then you can copy a result directory with all dependencies files to deploy and run on your target machine using the ema_project binary file (based on your runtime).
@@ -493,7 +486,7 @@ Project `JSONUtil/JSONUtil.csproj` added to the solution.
 This JSONUtil project uses [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json) package from the [NuGet](https://www.nuget.org/) platform for serialize/deserialize JSON data, so we add this package from NuGet to the project via the following command.
 
 ```bash
-root:/mnt/c/ema_solution/JSONUtil$ dotnet add package Newtonsoft.Json --version 13.0.3
+dotnet add package Newtonsoft.Json --version 13.0.3
 ```
 
 Now the JSONUtil project is ready for implementing the class to JSON source code.
@@ -502,7 +495,7 @@ Now the JSONUtil project is ready for implementing the class to JSON source code
 
 Once the package install succeed, open a solution with VS Code with the ```code .``` command in a ```ema_solution``` folder. The VS Code editor will be opened the EMA_SOLUTION solution like shown in the following image.
 
-![figure-7](images/07_ema_vscode_solution_1.png)
+![figure-7](images/07_ema_vscode_solution_1.png "class lib project init")
 
 Open a ```Class.cs``` file and add the following POCO code to the file.
 
@@ -601,11 +594,11 @@ Once the EMAConsumer project is finished setup, the VS Code workspace contains b
 
 That brings us to updating the source code to call EMA API interfaces and JSONUtil library to consume data from RTO and print that data as JSON message format.
 
-Firstly, add a ```.env``` file to the ```ema_solution/EMAConsumer``` folder with the following content:
+Firstly, add a ```.env``` file to the ```ema_solution/EMAConsumer``` folder with the following Authentication Version 2 content:
 
 ```ini
-CLIENT_ID=<Your Auth V Client-ID>
-CLIENT_SECRET=<Your Auth V Client-Secret>
+CLIENT_ID=<Your Auth V2 Client-ID>
+CLIENT_SECRET=<Your Auth V2 Client-Secret>
 ```
 
 Secondly, open the ```EMAConsumer/Program.cs``` file and add the following library import to the file header.
@@ -629,7 +622,7 @@ class Program
 }
 ```
 
-Next, modify the ```main()``` function to call the EMA API interfaces as follows:
+Next, modify the ```main()``` method to call the EMA API interfaces as follows:
 
 ```C#
 class Program
@@ -694,11 +687,11 @@ class Program
 The code above perform the following tasks:
 1. Create JSONUtil's ```RIC``` object.
 2. Create ```AppClient``` object and pass a ```RIC``` object to ```AppClient``` for storing data from the API.
-3. Create a ```OmmConsumerConfig``` with the RTO Authentication Version 2 credential.
+3. Create a ```OmmConsumerConfig``` object with the RTO Authentication Version 2 credential.
 4. Register the Login stream.
 5. Create a View request message that subscribes for *NETCHNG_1*, *BID*, and *ASK* fields, then subscribes item.
 
-์Now we come to the ```AppClient``` class path that needs to get a ```RIC``` object from the main class, update ```RIC``` object data with incoming data via the ```OnRefreshMsg``` and ```OnUpdateMsg``` callback methods and call ```RIC.ToJSON()``` method to print out incoming data as a JSON message.
+Now we come to the ```AppClient``` class path that needs to get a ```RIC``` object from the main class, update ```RIC``` object data with incoming data via the ```OnRefreshMsg``` and ```OnUpdateMsg``` callback methods and call ```RIC.ToJSON()``` method to print out incoming data as a JSON message.
 
 ```C#
 namespace EMAConsumer;
@@ -750,7 +743,7 @@ internal class AppClient: IOmmConsumerClient
 }
 
 ```
-Moving on the the ```Decode``` method that iterates incoming FieldList message and updates a ```RIC``` object's *NETCHNG_1*, *BID*, and *ASK* properties.  
+Moving on the the ```Decode()``` method that iterates incoming FieldList message and updates a ```RIC``` object's *NETCHNG_1*, *BID*, and *ASK* properties.  
 
 ```C#
 internal class AppClient: IOmmConsumerClient

@@ -111,7 +111,7 @@ That’s all I have to say about the RTSDK C# development with VS Code.
 ## <a id="ref"></a>References
 
 For further details, please check out the following resources:
-* [Real-Time SDK V# page](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) on the [LSEG Developer Community](https://developers.lseg.com/) website.
+* [Real-Time SDK C# page](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) on the [LSEG Developer Community](https://developers.lseg.com/) website.
 * [Real-Time SDK Family](https://developers.lseg.com/en/use-cases-catalog/refinitiv-real-time) page.
 * [Real-Time SDK C# Quick Start](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk/quick-start).
 * [Developer Article: 10 important things you need to know before you write an Enterprise Real Time application](https://developers.lseg.com/article/10-important-things-you-need-know-you-write-elektron-real-time-application).
