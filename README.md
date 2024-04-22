@@ -1,6 +1,6 @@
 # Step By Step Guide EMA C# project and solution with VS Code 
 - version: 1.0.0
-- Last Update: February 2024
+- Last Update: April 2024
 - Environment: Ubuntu or Windows
 - Compiler: .NET 6.0
 - Prerequisite: [prerequisite](#prerequisite)
