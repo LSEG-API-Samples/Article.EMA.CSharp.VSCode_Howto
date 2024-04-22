@@ -806,7 +806,7 @@ Build succeeded.
 Time Elapsed 00:00:03.17
 ```
 
-Unlike the Visual Studio IDE that you can set a solution default project and click the "Run" button on the IDE. With VS Code (and .NET CLI), you need to run the project in side a project folder using the ```dotnet run``` command or with ```dotnet run --project &lt;project/project.csproj&gt;``` (All required runtime file must be located on the solution home folder).
+Unlike the Visual Studio IDE that you can set a solution default project and click the "Run" button on the IDE. With VS Code (and .NET CLI), you need to run the project inside a project folder using the ```dotnet run``` command or with ```dotnet run --project &lt;project/project.csproj&gt;``` (All required runtime file must be located on the solution home folder).
 
 Run Result: Run inside the EMAConsumer project folder.
 
@@ -852,7 +852,7 @@ That’s all I have to say about how to build and run the EMA solution.
 
 ### <a id="publish_ema_solution"></a>Publishing the Solution
 
-So, now let’s look at how to publish our solution. You can publish the solution using the ```dotnet publish``` like the project by specify the the path and filename of a solution file (.sln extension) after the command. 
+So, now let’s look at how to publish our solution. You can publish the solution using the ```dotnet publish``` like the project by specify the path and filename of a solution file (.sln extension) after the command. 
 
 Example:
 ```bash
