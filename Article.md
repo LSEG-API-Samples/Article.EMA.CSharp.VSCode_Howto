@@ -1,8 +1,8 @@
-# Step By Step Guide EMA C# project and solution with VS Code 
+# Step By Step Guide EMA C# project and solution with VS Code
 
 ## <a id="intro"></a>Introduction
 
-[Real-Time SDK (C# Edition)](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) (RTSDK, formerly known as Elektron SDK) is a suite of modern and open source APIs ([GitHub](https://github.com/Refinitiv/Real-Time-SDK)) that aim to simplify development through a strong focus on ease of use and standardized access to a broad set of Refinitiv proprietary content and services via the proprietary TCP connection named RSSL and proprietary binary message encoding format named OMM Message. The capabilities range from low latency/high-performance APIs right through to simple streaming Web APIs. 
+[Real-Time SDK (C# Edition)](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) (RTSDK, formerly known as Elektron SDK) is a suite of modern and open source APIs ([GitHub](https://github.com/Refinitiv/Real-Time-SDK)) that aim to simplify development through a strong focus on ease of use and standardized access to a broad set of Refinitiv proprietary content and services via the proprietary TCP connection named RSSL and proprietary binary message encoding format named OMM Message. The capabilities range from low latency/high-performance APIs right through to simple streaming Web APIs.
 
 The RTSDK C# Edition can run on Windows, Oracle Linux Server, Red Hat Enterprise Server and Ubuntu Linux platforms. It supports the [Visual Studio 2022 IDE](https://visualstudio.microsoft.com/vs/) for the full features development experience but the IDE is available for Windows developers only. Fortunately, the RTSDK C# Edition also supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) framework and the [Visual Studio Code](https://code.visualstudio.com/) (aka VS Code) editor is available for all major OS platforms. Linux and Windows developers who are using the VS Code editor can implement the real-time streaming application with LSEG Real-Time platform using the RTSDK C# Edition.
 
@@ -25,6 +25,7 @@ Next, access the ```ema_project``` folder and create a new console project with 
 ```bash
 dotnet new console --framework net6.0 --use-program-main
 ```
+
 Example result:
 
 ```bash
@@ -54,7 +55,7 @@ Hello, World!
 
 ### <a id="add_ema_project"></a>Add EMA Library
 
-Now we come to how to add the EMA library to the project. The RTSDK C# libraries are available on the [NuGet](https://www.nuget.org/) package manager and distribution platform. 
+Now we come to how to add the EMA library to the project. The RTSDK C# libraries are available on the [NuGet](https://www.nuget.org/) package manager and distribution platform.
 
 ![figure-2](images/02_ema_nuget.png "EMA library on NuGet")
 
@@ -63,7 +64,9 @@ We can add the [EMA Core library](https://www.nuget.org/packages/LSEG.Ema.Core) 
 ```bash
 dotnet add package LSEG.Ema.Core --version 3.1.0
 ```
+
 Result:
+
 ```bash
 root:/mnt/c/ema_project$ dotnet add package LSEG.Ema.Core --version 3.1.0
   Determining projects to restore...
@@ -81,6 +84,7 @@ info : PackageReference for package 'LSEG.Ema.Core' version '3.1.0' added to fil
 info : Writing assets file to disk. Path:  /mnt/c/ema_project/obj/project.assets.json
 log  : Restored /mnt/c/ema_project (in 6.7 sec).
 ```
+
 You can use ```dotnet list package``` command to verify the EMA library package installation.
 
 ```bash
@@ -91,6 +95,7 @@ Project 'ema_project' has the following package references
    > LSEG.Ema.Core        3.1.0       3.1.0  
 
 ```
+
 Now the ema_project is ready for implementing the real-time application with EMA C# API.
 
 ### <a id="add_ema_code"></a>Add the Real-Time Application Source Code with EMA
@@ -150,6 +155,7 @@ class Program
   ...
 }
 ```
+
 Moving on the the ```Program``` class that act as the Consumer:
 
 ```C#
@@ -204,41 +210,42 @@ The final step is to create the ```EmaConfig.xml``` file with the configurations
 <!-- ConsumerGroup provides set of detailed configurations to be used by named consumers				-->
 <!-- Application specifies which configuration to use by setting OmmConsumerConfig::consumerName()		-->
 <ConsumerGroup>
-	<!-- DefaultConsumer parameter defines which consumer configuration is used by OmmConsumer			-->
-	<!-- if application does not specify it through OmmConsumerConfig::consumerName()					-->
-	<!-- first consumer on the ConsumerList is a DefaultConsumer if this parameter is not specified		-->
-	<DefaultConsumer value="Consumer_4"/>
-	<ConsumerList>
-		<Consumer>
-			<Name value="Consumer_4"/>
-			<!-- ChannelSet specifies an ordered list of Channels to which OmmConsumer will attempt to	-->
-			<!-- connect, one at a time, if the previous one fails to connect							-->
-			<ChannelSet value="Channel_4"/>
-			<Logger value="Logger_1"/>
-			<Dictionary value="Dictionary_1"/>
-			<XmlTraceToStdout value="0"/>
-		</Consumer>
-	</ConsumerList>
+ <!-- DefaultConsumer parameter defines which consumer configuration is used by OmmConsumer			-->
+ <!-- if application does not specify it through OmmConsumerConfig::consumerName()					-->
+ <!-- first consumer on the ConsumerList is a DefaultConsumer if this parameter is not specified		-->
+ <DefaultConsumer value="Consumer_4"/>
+ <ConsumerList>
+  <Consumer>
+   <Name value="Consumer_4"/>
+   <!-- ChannelSet specifies an ordered list of Channels to which OmmConsumer will attempt to	-->
+   <!-- connect, one at a time, if the previous one fails to connect							-->
+   <ChannelSet value="Channel_4"/>
+   <Logger value="Logger_1"/>
+   <Dictionary value="Dictionary_1"/>
+   <XmlTraceToStdout value="0"/>
+  </Consumer>
+ </ConsumerList>
 </ConsumerGroup>
 
 <ChannelGroup>
-	<ChannelList>
-		<Channel>
-			<Name value="Channel_4"/>
-			<ChannelType value="ChannelType::RSSL_ENCRYPTED"/>
-			<CompressionType value="CompressionType::None"/>
-			<GuaranteedOutputBuffers value="5000"/>
-			<!-- EMA discovers a host and a port from RDP service discovery for the specified location 
+ <ChannelList>
+  <Channel>
+   <Name value="Channel_4"/>
+   <ChannelType value="ChannelType::RSSL_ENCRYPTED"/>
+   <CompressionType value="CompressionType::None"/>
+   <GuaranteedOutputBuffers value="5000"/>
+   <!-- EMA discovers a host and a port from RDP service discovery for the specified location 
 			    when both of them are not set and the session management is enable. -->
-			<Location value="ap-southeast-1"/>
-			<EnableSessionManagement value="1"/>
-			<EncryptedProtocolType value="EncryptedProtocolType::RSSL_SOCKET"/>
-		</Channel>
-	</ChannelList>
+   <Location value="ap-southeast-1"/>
+   <EnableSessionManagement value="1"/>
+   <EncryptedProtocolType value="EncryptedProtocolType::RSSL_SOCKET"/>
+  </Channel>
+ </ChannelList>
 </ChannelGroup>
 ...
 </EmaConfig>
 ```
+
 That covers the coding part of the project.
 
 ### <a href="build_run_app_project"></a>Build and Run Real-Time Application Source Code
@@ -248,6 +255,7 @@ That brings us to build and run our source code step we just created. To build t
 ```bash
 dotnet build --configuration {Debug or Release}
 ```
+
 Please note that the default configuration value is **Debug**.
 
 Example:
@@ -265,6 +273,7 @@ Build succeeded.
 
 Time Elapsed 00:00:02.44
 ```
+
 Then the generated executable ```project_name.dll``` files (and ```project_name.exe``` files if you are on Windows) will be available in the *&lt;project folder&gt;/bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder as follows:
 
 ![figure-4](images/04_ema_dotnet_build.png "dotnet build result")
@@ -273,13 +282,13 @@ Please keep in mind that the product of ```dotnet build``` command **isn't ready
 
 For more detail about the dotnet build command options, please check the [dotnet build document](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) page.
 
-Next, we come to the [dotnet run](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-run) command. This command provides a convenient option to run your application from the source code with one command. 
+Next, we come to the [dotnet run](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-run) command. This command provides a convenient option to run your application from the source code with one command.
 
 ```bash
 dotnet run
 ```
 
-Please note that the ```dotnet run``` command automatically build the project using ```dotnet build``` command if necessary. 
+Please note that the ```dotnet run``` command automatically build the project using ```dotnet build``` command if necessary.
 
 Example:
 
@@ -380,6 +389,7 @@ Let’s leave the build and run step there.
 ### <a id="publish_project"></a>Publishing the Project
 
 Now let me turn to how to publish our project. The ```dotnet publish``` command compiles the application, reads through its dependencies specified in the project file, and publishes the resulting set of files to a directory (containing dll, configuration json files, dependencies files, etc). The command output is ready for deployment to a hosting system for execution.  You can publish the .NET application in 2 modes as follows:
+
 - *self-contained* mode: This mode produces an application that includes the .NET runtime and libraries, and your application and its dependencies. Users of the application can run it on a machine that doesn't have the .NET runtime installed.
 - *framework-dependent*: This mode produces an application that includes only your application itself and its dependencies. Users of the application have to separately install the .NET runtime.
 
@@ -397,6 +407,7 @@ MSBuild version 17.7.4+3ebbd7c49 for .NET
   ema_project -> /mnt/c/ema_project/bin/Debug/net6.0/ema_project.dll
   ema_project -> /mnt/c/ema_project/bin/Debug/net6.0/publish/
 ```
+
 Result:
 
 ![figure-5](images/05_ema_dotnet_publish_1.png "Publish a framework-dependent executable result")
@@ -413,6 +424,7 @@ MSBuild version 17.3.2+561848881 for .NET
   ema_project -> /mnt/c/ema_project/bin/Release/net6.0/win-x64/ema_project.dll
   ema_project -> /mnt/c/ema_project/bin/Release/net6.0/win-x64/publish/
 ```
+
 Result:
 
 ![figure-6](images/06_ema_dotnet_publish_2.png "Publish a self-contained executable for Windows x64 result")
@@ -420,9 +432,9 @@ Result:
 Then you can copy a result directory with all dependencies files to deploy and run on your target machine using the ema_project binary file (based on your runtime).
 
 To learn more about the publish and deployment options, please check the following resources:
-* [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) document.
-* [.NET runtime identifier catalog](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog) document.
-* [.NET application publishing overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/) documents.
+- [dotnet publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) document.
+- [.NET runtime identifier catalog](https://learn.microsoft.com/en-us/dotnet/core/rid-catalog) document.
+- [.NET application publishing overview](https://learn.microsoft.com/en-us/dotnet/core/deploying/) documents.
 
 That all I have to say about creating single EMA C# API Project using VS Code.
 
@@ -443,6 +455,7 @@ Next, access the ```ema_solution``` folder and create a new console project with
 ```bash
 dotnet new sln
 ```
+
 Example result:
 
 ```bash
@@ -451,7 +464,9 @@ root:/mnt/c$cd ema_solution
 root:/mnt/c/ema_solution$ dotnet new sln
 The template "Solution File" was created successfully.
 ```
+
 Our EMA Solution has 2 projects as follows:
+
 - A *JSONUtil* class library project that contains a POCO object for storing RIC data and transform the RIC data into a JSON message format
 - A EMA C# console project that connects and consume data from RTO, and print the market price data in JSON message format using a JSONUtil class library above.
 
@@ -462,7 +477,9 @@ Let's start with a class library project. Firstly, create a new project inside `
 ```bash
 dotnet new classlib -f net6.0 -o JSONUtil
 ```
+
 Result:
+
 ```bash
 root:/mnt/c/ema_solution$ dotnet new classlib -f net6.0 -o JSONUtil
 The template "Class Library" was created successfully.
@@ -473,12 +490,15 @@ Running 'dotnet restore' on /mnt/c/ema_solution/JSONUtil/JSONUtil.csproj...
   Restored /mnt/c/ema_solution/JSONUtil/JSONUtil.csproj (in 67 ms).
 Restore succeeded.
 ```
+
 Next, add this JSONUtil project to solution with the following command
 
 ```bash
 dotnet sln add JSONUtil/JSONUtil.csproj
 ```
+
 Result:
+
 ```bash
 Project `JSONUtil/JSONUtil.csproj` added to the solution.
 ```
@@ -498,7 +518,6 @@ Once the package install succeed, open a solution with VS Code with the ```code 
 ![figure-7](images/07_ema_vscode_solution_1.png "class lib project init")
 
 Open a ```Class.cs``` file and add the following POCO code to the file.
-
 
 ```C#
 namespace JSONUtil;
@@ -549,6 +568,7 @@ Build succeeded.
 
 Time Elapsed 00:00:02.42
 ```
+
 That covers the JSONUtil class library project implementation.
 
 ### <a id="init_ema_solution"></a>Initialize A EMA API Project
@@ -558,6 +578,7 @@ Moving on to the EMAConsumer project. Please go back to the ```ema_solution``` f
 ```bash
 dotnet new console --framework net6.0 -o EMAConsumer --use-program-main
 ```
+
 Next, add this EMAConsumer project to solution with the following command
 
 ```bash
@@ -569,6 +590,7 @@ The newly created EMAConsumer project does not have access to the JSONUtil class
 ```bash
 dotnet add EMAConsumer/EMAConsumer.csproj reference JSONUtil/JSONUtil.csproj
 ```
+
 Example:
 
 ```bash
@@ -589,7 +611,6 @@ Once the EMAConsumer project is finished setup, the VS Code workspace contains b
 
 ![figure-8](images/08_ema_vscode_solution_2.png "EMAConsumer and JSONUtil projects in VS Code solution")
 
-
 ### <a id="code_ema_solution"></a>Add the Real-Time Application Source Code with EMA
 
 That brings us to updating the source code to call EMA API interfaces and JSONUtil library to consume data from RTO and print that data as JSON message format.
@@ -602,7 +623,6 @@ CLIENT_SECRET=<Your Auth V2 Client-Secret>
 ```
 
 Secondly, open the ```EMAConsumer/Program.cs``` file and add the following library import to the file header.
-
 
 ```C#
 namespace EMAConsumer;
@@ -651,7 +671,7 @@ class Program
             Console.WriteLine("Subscribing to market data");
 
             LoginReq loginReq = new();
-			consumer.RegisterClient(loginReq.Message(), appClient);
+   consumer.RegisterClient(loginReq.Message(), appClient);
 
             OmmArray array = new()
             {
@@ -660,13 +680,13 @@ class Program
 
             array.AddInt(11) //NETCHNG_1
                 .AddInt(22) //BID
-				.AddInt(25) //ASK
-				.Complete();
+    .AddInt(25) //ASK
+    .Complete();
             
             var view = new ElementList()
-				.AddUInt(EmaRdm.ENAME_VIEW_TYPE, 1)
-				.AddArray(EmaRdm.ENAME_VIEW_DATA, array)
-				.Complete();
+    .AddUInt(EmaRdm.ENAME_VIEW_TYPE, 1)
+    .AddArray(EmaRdm.ENAME_VIEW_DATA, array)
+    .Complete();
             
             RequestMsg reqMsg = new();
 
@@ -685,6 +705,7 @@ class Program
 ```
 
 The code above perform the following tasks:
+
 1. Create JSONUtil's ```RIC``` object.
 2. Create ```AppClient``` object and pass a ```RIC``` object to ```AppClient``` for storing data from the API.
 3. Create a ```OmmConsumerConfig``` object with the RTO Authentication Version 2 credential.
@@ -720,21 +741,21 @@ internal class AppClient: IOmmConsumerClient
         } else
         {
             if (DataType.DataTypes.FIELD_LIST == refreshMsg.Payload().DataType)
-			    Decode(refreshMsg.Payload().FieldList());
+       Decode(refreshMsg.Payload().FieldList());
 
             Console.WriteLine(_ric.ToJSON());
         }
 
-		Console.WriteLine();
+  Console.WriteLine();
     }
     public void OnUpdateMsg(UpdateMsg updateMsg, IOmmConsumerEvent consumerEvent)
     {
         Console.WriteLine("Update Message");
-		if (DataTypes.FIELD_LIST == updateMsg.Payload().DataType)
-			Decode(updateMsg.Payload().FieldList());
-		
+  if (DataTypes.FIELD_LIST == updateMsg.Payload().DataType)
+   Decode(updateMsg.Payload().FieldList());
+  
         Console.WriteLine(_ric.ToJSON());
-		Console.WriteLine();
+  Console.WriteLine();
     }
     public void OnStatusMsg(StatusMsg statusMsg, IOmmConsumerEvent consumerEvent)
     {
@@ -743,6 +764,7 @@ internal class AppClient: IOmmConsumerClient
 }
 
 ```
+
 Moving on the the ```Decode()``` method that iterates incoming FieldList message and updates a ```RIC``` object's *NETCHNG_1*, *BID*, and *ASK* properties.  
 
 ```C#
@@ -781,6 +803,7 @@ internal class AppClient: IOmmConsumerClient
     }
 }
 ```
+
 The final step is to create the ```EmaConfig.xml``` file with the configurations like the ```ema_project``` above to configure the API to connect to RTO endpoint.
 
 That covers the EMAConsumer project part.
@@ -852,9 +875,10 @@ That’s all I have to say about how to build and run the EMA solution.
 
 ### <a id="publish_ema_solution"></a>Publishing the Solution
 
-So, now let’s look at how to publish our solution. You can publish the solution using the ```dotnet publish``` like the project by specify the path and filename of a solution file (.sln extension) after the command. 
+So, now let’s look at how to publish our solution. You can publish the solution using the ```dotnet publish``` like the project by specify the path and filename of a solution file (.sln extension) after the command.
 
 Example:
+
 ```bash
 dotnet publish ./ema_solution.sln 
 ```
@@ -877,7 +901,7 @@ MSBuild version 17.3.2+561848881 for .NET
   EMAConsumer -> /mnt/c/ema_solution/EMAConsumer/bin/Release/net6.0/win-x64/publish/
 ```
 
-The publish result will be available inside each Project' */bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder like the following example of the Class Library project. 
+The publish result will be available inside each Project' */bin/&lt;Debug/Release&gt;/&lt;dotnet target version&gt;* folder like the following example of the Class Library project.
 
 ![figure-9](images/09_ema_publish_proj_1.png "JSONUtil project publish result")
 
@@ -887,6 +911,58 @@ About the EMAConsumer, the publish result also contains the JSONUtil class libra
 
 That covers the EMA Solution creation with VS Code.
 
+### Update June 2024, For the multiple .NET SDK versions
+
+If you have multiple .NET SDK versions installed on your machine, you can run the following steps to configure the SDK version for the project/solution.
+
+Firstly go to the project or solution root folder, and run the following command:
+
+```bash
+dotnet --list-sdks
+```
+
+It shows all available SDK in your machine (based on your installation) as follows:
+
+```bash
+#windows
+2.1.526 [C:\Program Files\dotnet\sdk]
+5.0.104 [C:\Program Files\dotnet\sdk]
+6.0.423 [C:\Program Files\dotnet\sdk]
+7.0.201 [C:\Program Files\dotnet\sdk]
+8.0.206 [C:\Program Files\dotnet\sdk]
+#linux
+2.1.818 [/usr/share/dotnet/sdk]
+3.1.426 [/usr/share/dotnet/sdk]
+5.0.408 [/usr/share/dotnet/sdk]
+6.0.419 [/usr/share/dotnet/sdk]
+7.0.406 [/usr/share/dotnet/sdk]
+```
+
+Next, run the following command to create a dotnet [global.json](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json) file:
+
+```bash
+dotnet new globaljson
+```
+
+Open a ```global.json``` file, it looks like this (the SDK will be the latest version in your machine):
+
+```json
+{
+  "sdk": {
+    "version": "8.0.206"
+  }
+}
+```
+
+Change the content of a ```global.json``` file to version 6.x in your machine as follows:
+
+```json
+{
+  "sdk": {
+    "version": "6.0.423"
+  }
+}
+```
 <!--
 ## Docker
 1. docker build . -t dotnetema
