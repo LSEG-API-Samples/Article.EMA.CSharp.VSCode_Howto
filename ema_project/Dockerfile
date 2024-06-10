@@ -6,10 +6,12 @@ LABEL maintainer="Developer Relations"
 # Create app directory
 WORKDIR /App
 
-# Copy everything
-COPY . ./
+# Copy projecf file
+COPY *.csproj ./
 # Restore as distinct layers
 RUN dotnet restore
+# Copy everything else
+COPY . ./
 # Build and publish a release
 RUN dotnet publish --configuration Release -o out
 

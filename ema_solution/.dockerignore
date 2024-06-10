@@ -4,3 +4,4 @@ EMAConsumer/.env
 EMAConsumer/.env.example
 JSONUtil/bin/
 JSONUtil/obj/
+global.json

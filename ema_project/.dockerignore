@@ -2,3 +2,4 @@ bin/
 obj/
 .env
 .env.example
+global.json
