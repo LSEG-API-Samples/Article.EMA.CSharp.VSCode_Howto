@@ -6,12 +6,16 @@ LABEL maintainer="Developer Relations"
 # Create app directory
 WORKDIR /App
 
-# Copy everything
-COPY . ./
+# Copy project files
+COPY ema_solution.sln ./
+COPY EMAConsumer/EMAConsumer.csproj /App/EMAConsumer/EMAConsumer.csproj
+COPY JSONUtil/JSONUtil.csproj /App/JSONUtil/JSONUtil.csproj
 # Restore as distinct layers
-RUN dotnet restore
+RUN dotnet restore ema_solution.sln
+# Copy everything else
+COPY . ./
 # Build and publish a release
-RUN dotnet publish --configuration Release -o out
+RUN dotnet publish ema_solution.sln --configuration Release -o out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION}-${VARIANT} as release

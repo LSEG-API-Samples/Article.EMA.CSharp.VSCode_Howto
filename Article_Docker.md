@@ -23,7 +23,7 @@ Container Benefits:
 - Streamline the whole dev and test cycle by shipping the application as container which is easy for deployment.
 - Increases collaboration and efficiency between dev and operations teams to ship apps faster.
 - Portability between OS platforms and between clouds.
-- Container is lightweight, so many containers can be supported on the same infrastructure. 
+- Container is lightweight, so many containers can be supported on the same infrastructure.
 - Easy for rapid scale-up and scale-down scenarios.
 
 ## Containerize EMA C# Project and Solution
@@ -32,12 +32,15 @@ The [.NET Docker Images](https://github.com/dotnet/dotnet-docker) are hosted on 
 
 ### Docker ignore file
 
-Before I am going further, let's start by creating a ```.dockerignore``` file inside a ```ema_project``` folder to define the files/folders that we do not want Docker to build or copy to an image. Those files and folders are the compiled files/folders in our environment and a ```.env``` file.
+Before I am going further, let's start by creating a ```.dockerignore``` file inside a ```ema_solution``` folder to define the files/folders that we do not want Docker to build or copy to an image. Those files and folders are the compiled files/folders in our environment and a ```.env``` file.
 
 ```ini
-bin/
-obj/
-.env
+EMAConsumer/bin/
+EMAConsumer/obj/
+EMAConsumer/.env
+EMAConsumer/.env.example
+JSONUtil/bin/
+JSONUtil/obj/
 global.json
 ```
 
@@ -45,7 +48,7 @@ global.json
 
 ### Let's build our first image
 
-The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_project``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_project``` folder) is as follows:
+The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_solution``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_solution``` folder) is as follows:
 
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:6.0
@@ -59,14 +62,16 @@ COPY . ./
 RUN dotnet restore
 # Build and publish a release
 RUN dotnet publish --configuration Release -o out
+#Copy EmaConfig.xml
+COPY EMAConsumer/EmaConfig.xml .
 #Run the application
-ENTRYPOINT ["dotnet","/App/out/ema_project.dll"]
+ENTRYPOINT ["dotnet","/App/out/EMAConsumer.dll"]
 ```
 
 Then build a docker image from with the following [docker build](https://docs.docker.com/reference/cli/docker/image/build/) command:
 
 ```bash
-docker build . -t emacsharp_project
+docker build . -t emacsharp_solution
 ```
 
 Once a build process is successful, you can use a [docker images](https://docs.docker.com/reference/cli/docker/image/ls/) command to check our newly created Docker image.
@@ -76,18 +81,55 @@ Once a build process is successful, you can use a [docker images](https://docs.d
 We can run a EMA C# project container via a [docker run](https://docs.docker.com/reference/cli/docker/container/run/) command as follows (you should have a ```.env``` file that have your Authentication Version 2 define in it):
 
 ```bash
-docker run -it --name emacsharp_project --env-file .env emacsharp_project
+docker run -it --name emacsharp_solution --env-file EMAConsumer/.env emacsharp_solution
 ```
 
 Result:
 
 ![figure-3](images/container/container_3.png)
 
-However, our images isn't optimized yet. The image size is 893mb which is very huge. It is ideally to share smaller images among the teams.
+However, our images isn't optimized yet. The image size is also 893mb which is very huge. It is ideally to share smaller images among the teams.
+
+### Optimize dotnet Restore
+
+By default, each instruction in a Dockerfile translates to a layer in your final image in an order specified. If Docker finds that you have already executed a similar instruction before, Docker skips that layer and uses the cached result instead. However, if there is a layer that have been changed (updated code, add new instruction, etc.), that layer will need to be re-built. And if a layer is changed, all other layers that come after it are also affected and need to re-built too.
+
+This is called a *Docker build cache*. One main target of a Dockerfile optimization is structuring a Dockerfile to reuse results from previous builds and skipping unnecessary work as much as possible.
+
+For .NET application, it is advisable to copy only the **.csproj**, **.sln**, and **nuget.config** files for your application before performing a [dotnet restore](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-restore) command. By copying those files first, Docker can cache the project dependencies restoration result, and the dependencies restoration process will not be effected by just a code changed.
+
+```dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
+# Create app directory
+WORKDIR /App
+
+# Copy project files
+COPY ema_solution.sln ./
+COPY EMAConsumer/EMAConsumer.csproj /App/EMAConsumer/EMAConsumer.csproj
+COPY JSONUtil/JSONUtil.csproj /App/JSONUtil/JSONUtil.csproj
+# Restore as distinct layers
+RUN dotnet restore
+# Copy everything else
+COPY . ./
+# Build and publish a release
+RUN dotnet publish --configuration Release -o out
+
+#Copy EmaConfig.xml
+COPY EMAConsumer/EmaConfig.xml .
+#Run the application
+ENTRYPOINT ["dotnet","/App/out/EMAConsumer.dll"]
+```
+
+Now, we have optimized our Dockerfile to copy the solution *.sln* and *.csproj* files and run a *dotnet restore* command before copy the source code. However, if you run a *docker images* command you will be noticed that the image size does not change. How can we reduce our image size?
+
+### Multi-Stage Build
+
+[tbd]
 
 ## Reference
 
 - [Docker: Containerize a .NET application](https://docs.docker.com/language/dotnet/containerize/)
 - [Microsoft Learn: Tutorial - Containerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-8-0)
 - [Docker Blog: 9 Tips for Containerizing Your .NET Application](https://www.docker.com/blog/9-tips-for-containerizing-your-net-application/)
-- 
+-
