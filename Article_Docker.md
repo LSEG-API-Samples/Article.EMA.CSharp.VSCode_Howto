@@ -16,6 +16,8 @@ According to [Docker](https://www.docker.com/resources/what-container/) and [Azu
 
 ![figure-1](images/container/container_1.png)
 
+Image from [Azure website](https://azure.microsoft.com/en-in/resources/cloud-computing-dictionary/what-is-a-container).
+
 Container Benefits:
 
 - Enable developers and IT professionals to deploy applications across environments with little or no modification.
@@ -51,7 +53,8 @@ global.json
 The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_solution``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_solution``` folder) is as follows:
 
 ```dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:6.0
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0
+LABEL maintainer="Developer Relations"
 
 # Create app directory
 WORKDIR /App
@@ -67,6 +70,8 @@ COPY EMAConsumer/EmaConfig.xml .
 #Run the application
 ENTRYPOINT ["dotnet","/App/out/EMAConsumer.dll"]
 ```
+
+Please be noticed that I am setting the optional ```--platform=linux/amd64``` flag  to make sure our image is always in *linux/amd64* platform.
 
 Then build a docker image from with the following [docker build](https://docs.docker.com/reference/cli/docker/image/build/) command:
 
@@ -96,10 +101,16 @@ By default, each instruction in a Dockerfile translates to a layer in your final
 
 This is called a *Docker build cache*. One main target of a Dockerfile optimization is structuring a Dockerfile to reuse results from previous builds and skipping unnecessary work as much as possible.
 
+You can find more detail about a Docker build cache behavior from the following resources:
+
+- [Docker build cache document](https://docs.docker.com/build/cache/)
+- [Using the build cache document](https://docs.docker.com/guides/docker-concepts/building-images/using-the-build-cache/)
+
 For .NET application, it is advisable to copy only the **.csproj**, **.sln**, and **nuget.config** files for your application before performing a [dotnet restore](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-restore) command. By copying those files first, Docker can cache the project dependencies restoration result, and the dependencies restoration process will not be effected by just a code changed.
 
 ```dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:6.0
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0
+LABEL maintainer="Developer Relations"
 
 # Create app directory
 WORKDIR /App
