@@ -109,23 +109,80 @@ internal class AppClient: IOmmConsumerClient
 }
 class Program
 {
+    public static string RicName { get; set; } = "JPY=";
+    public static string? clientID { get; set; } = "<Client_ID>";
+    public static string? clientSecret { get; set; } = "<Client_Secret>";
+
+    static void printHelp()
+	{
+	    Console.WriteLine("\nOptions:\n" + "  -H\tShows this usage\n"
+	    		+ "  -clientId machine account to perform authorization with the\r\n" 
+	    		+ "\ttoken service (can be set via CLIENT_ID environment variable).\n"
+	    		+ "  -clientSecret associated client secret with the machine id \r\n"
+	    		+ "\tservice (can be set via CLIENT_SECRET environment variable).\n"
+	    		+ "  -itemName Request item name (optional).\n"
+	    		+ "\n");
+	}
+
+    static void readCommandlineArgs(string[] args)
+	{
+        try
+	    {
+            int argsCount = 0;
+            while (argsCount < args.Length)
+	        {
+                if (0 == args[argsCount].CompareTo("-H"))
+	            {
+	                printHelp();
+                    Environment.Exit(0);
+	            }
+                 else if ("-clientId".Equals(args[argsCount]))
+    			{
+                    clientID = argsCount < (args.Length - 1) ? args[++argsCount] : null;
+    				++argsCount;				
+    			}
+	            else if ("-clientSecret".Equals(args[argsCount]))
+    			{
+	            	clientSecret = argsCount < (args.Length-1) ? args[++argsCount] : null;
+    				++argsCount;				
+    			}
+    			else if ("-itemName".Equals(args[argsCount]))
+    			{
+    				if(argsCount < (args.Length-1))	RicName = args[++argsCount];
+    				++argsCount;
+    			}
+                else // unrecognized command line argument
+    			{
+    				printHelp();
+                    Environment.Exit(0);
+    			}	
+            }
+        }    
+        catch
+        {
+        	printHelp();
+            Environment.Exit(0);
+        }
+    }
     static void Main(string[] args)
     {
-
-        string RicName = "JPY=";
-        string ServiceName = "ELEKTRON_DD";
-        RIC ric = new RIC(RicName,ServiceName);
-
+        const string  ServiceName = "ELEKTRON_DD";
         DotNetEnv.Env.Load();
         OmmConsumer? consumer = null;
         try{
+            // Get Client ID and Client Secret from Environment variable first
+            clientID = Environment.GetEnvironmentVariable("CLIENT_ID") ?? "<Client_ID>";
+            clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? "<Client_Secret>";
+            // Get Client ID,Client Secret, and item name from command line argument
+            readCommandlineArgs(args);
+
+            RIC ric = new RIC(RicName,ServiceName);
+
             // instantiate callback client
             AppClient appClient = new();
             appClient.SetRicObj(ric);
             Console.WriteLine("Connecting to market data server");
 
-            string clientID = Environment.GetEnvironmentVariable("CLIENT_ID") ?? "<Client_ID>";
-            string clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET") ?? "<Client_Secret>";
             OmmConsumerConfig config = new OmmConsumerConfig().ClientId(clientID).ClientSecret(clientSecret);
             // create OMM consumer
             consumer = new OmmConsumer(config);
@@ -153,7 +210,7 @@ class Program
             RequestMsg reqMsg = new();
 
             consumer.RegisterClient(reqMsg.ServiceName(ServiceName).Name(RicName).Payload(view), appClient);
-            Thread.Sleep(60000); // 
+            Thread.Sleep(90000); // 
 
         }catch (OmmException excp){
             Console.WriteLine($"Exception subscribing to market data: {excp.Message}");

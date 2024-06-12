@@ -28,6 +28,32 @@ Container Benefits:
 - Container is lightweight, so many containers can be supported on the same infrastructure.
 - Easy for rapid scale-up and scale-down scenarios.
 
+## <a id="prerequisite"></a>Prerequisite
+
+Before I am going further, there is some prerequisite, dependencies, and libraries that the project is needed.
+
+### The Main Project Prerequisite
+
+This Docker project requires all prerequisite mentioned in the [Prerequisite section of the README.md](./README.md) document.
+
+### Docker Desktop Application
+
+The [Docker Desktop](https://www.docker.com/products/docker-desktop/) application is required to run this Docker project.
+
+That covers the prerequisite of this project.
+
+## Updating EMA Solution Source Code
+
+The EMAConsumer project inside the ```ema_solution``` has been updated to receive the following information via a command line argument:
+
+- ```-clientId```: Authentication Version 2 CLIENT_ID information.
+- ```-clientSecret```: Authentication Version 2 CLIENT_SECRET information.
+- ```-itemName```: The RIC name you want to subscribe to.
+
+Please see the [Program.cs](./ema_solution/EMAConsumer/Program.cs) for more detail about the changed.
+
+**Note**: You can also set the *CLIENT_ID* and *CLIENT_SECRET* information via the Environment variables or a ```.env``` file too.
+
 ## Containerize EMA C# Project and Solution
 
 The [.NET Docker Images](https://github.com/dotnet/dotnet-docker) are hosted on the [Microsoft Container Registry repository](https://mcr.microsoft.com/en-us/). We can use a [Docker desktop application](https://www.docker.com/products/docker-desktop/) to pull .NET Docker Images directly.
@@ -85,16 +111,16 @@ Once a build process is successful, you can use a [docker images](https://docs.d
 We can run a EMA C# project container via a [docker run](https://docs.docker.com/reference/cli/docker/container/run/) command as follows (you should have a ```.env``` file that have your Authentication Version 2 define in it):
 
 ```bash
-docker run -it --name emacsharp_solution --env-file EMAConsumer/.env emacsharp_solution
+docker run -it --name emacsharp_solution --env-file EMAConsumer/.env emacsharp_solution -itemName THB=
 ```
 
 Result:
 
 ![figure-3](images/container/container_3.png)
 
-However, our images isn't optimized yet. The image size is also 893mb which is very huge. It is ideally to share smaller images among the teams.
+However, our images isn't optimized yet. The image size is also 905mb which is very huge. It is ideally to share smaller images among the teams.
 
-### Optimize dotnet Restore
+### Optimize Dotnet Restore
 
 By default, each instruction in a Dockerfile translates to a layer in your final image in an order specified. If Docker finds that you have already executed a similar instruction before, Docker skips that layer and uses the cached result instead. However, if there is a layer that have been changed (updated code, add new instruction, etc.), that layer will need to be re-built. And if a layer is changed, all other layers that come after it are also affected and need to re-built too.
 
@@ -222,6 +248,8 @@ Please be noticed that the final image is based on the [Alpine Linux](https://al
 
 ## Reference
 
+For further details, please check out the following resources:
+
 - [Docker: Containerize a .NET application](https://docs.docker.com/language/dotnet/containerize/)
 - [Microsoft Learn: Tutorial - Containerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-8-0)
 - [Docker Blog: 9 Tips for Containerizing Your .NET Application](https://www.docker.com/blog/9-tips-for-containerizing-your-net-application/)
@@ -230,4 +258,6 @@ Please be noticed that the final image is based on the [Alpine Linux](https://al
 - [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
 - [Docker build reference](https://docs.docker.com/reference/cli/docker/image/build/)
 - [Docker run reference](https://docs.docker.com/reference/cli/docker/container/run/)
-
+- [Docker build cache document](https://docs.docker.com/build/cache/)
+- [Using the build cache document](https://docs.docker.com/guides/docker-concepts/building-images/using-the-build-cache/)
+- [Docker Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
