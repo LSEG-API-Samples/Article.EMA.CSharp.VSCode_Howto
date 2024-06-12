@@ -53,7 +53,7 @@ global.json
 The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_solution``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_solution``` folder) is as follows:
 
 ```dockerfile
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0
+FROM mcr.microsoft.com/dotnet/sdk:6.0
 LABEL maintainer="Developer Relations"
 
 # Create app directory
@@ -64,14 +64,13 @@ COPY . ./
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
+RUN dotnet build 
 RUN dotnet publish --configuration Release -o out
 #Copy EmaConfig.xml
 COPY EMAConsumer/EmaConfig.xml .
 #Run the application
 ENTRYPOINT ["dotnet","/App/out/EMAConsumer.dll"]
 ```
-
-Please be noticed that I am setting the optional ```--platform=linux/amd64``` flag  to make sure our image is always in *linux/amd64* platform.
 
 Then build a docker image from with the following [docker build](https://docs.docker.com/reference/cli/docker/image/build/) command:
 
@@ -109,7 +108,7 @@ You can find more detail about a Docker build cache behavior from the following 
 For .NET application, it is advisable to copy only the **.csproj**, **.sln**, and **nuget.config** files for your application before performing a [dotnet restore](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-restore) command. By copying those files first, Docker can cache the project dependencies restoration result, and the dependencies restoration process will not be effected by just a code changed.
 
 ```dockerfile
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0
+FROM mcr.microsoft.com/dotnet/sdk:6.0
 LABEL maintainer="Developer Relations"
 
 # Create app directory
@@ -134,13 +133,101 @@ ENTRYPOINT ["dotnet","/App/out/EMAConsumer.dll"]
 
 Now, we have optimized our Dockerfile to copy the solution *.sln* and *.csproj* files and run a *dotnet restore* command before copy the source code. However, if you run a *docker images* command you will be noticed that the image size does not change. How can we reduce our image size?
 
-### Multi-Stage Build
+### Multi-Stage Builds
 
-[tbd]
+[Docker Multi-stage builds](https://docs.docker.com/build/building/multi-stage/) is a technique for optimizing a Dockerfile with multiple ```FROM``` statements. Each ```FROM``` instruction can use a different image base,and each of them begins a new stage of the build. You can selectively copy artifacts from one stage to another, leaving behind everything you don't want in the final image.
+
+The easiest multi-stage builds is to use two ```FROM``` instructions, one is the *full SDK image* for build the application, and another one is the *runtime image* for running the application only. This technique help optimizes a Dockerfile to be in ordered, easy to read and maintain, and also reduce the final image size dramatically.
+
+Microsoft offers various types of images for developers. The [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) is suitable for developing, building, and testing .NET applications, the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) is optimizing for running .NET applications in production. I am using these two images in our multi-stage Dockerfile.
+
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
+LABEL maintainer="Developer Relations"
+
+# Create app directory
+WORKDIR /App
+
+# Copy project files
+COPY ema_solution.sln ./
+COPY EMAConsumer/EMAConsumer.csproj /App/EMAConsumer/EMAConsumer.csproj
+COPY JSONUtil/JSONUtil.csproj /App/JSONUtil/JSONUtil.csproj
+# Restore as distinct layers
+RUN dotnet restore ema_solution.sln
+# Copy everything else
+COPY . ./
+# Build and publish a release
+RUN dotnet publish ema_solution.sln --configuration Release -o out 
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/runtime:6.0 as release
+# Create app directory
+WORKDIR /App
+COPY --from=builder /App/out .
+COPY EMAConsumer/EmaConfig.xml .
+ENTRYPOINT ["dotnet","EMAConsumer.dll"]
+```
+
+Based on a ```Dockerfile``` above, the first ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/sdk:6.0* SDK image as a *builder stage*. The builder stage's instructions is just copy the project files and build an application binary.
+
+The second ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/runtime:6.0* image as a *release stage*. The instructions are just copy the built result from the *build stage* and the EmaConfig.xml file to the final image.
+
+The final image contains only runtime, libraries, and necessary file to run the application. When you rebuild a Docker image with ```docker build . -t emacsharp_solution``` command, the image size is reduced to 193mb as follows.
+
+![figure-4](images/container/container_4.png)
+
+If you recheck a Tags section of the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) page, you will be noticed that the .NET Runtime container images have several variants including the [Alpine variant image](https://www.docker.com/blog/how-to-use-the-alpine-docker-official-image/). The Alpine image has a smaller footprint, takes up less disk space, and supports a package manager (if you need it).
+
+I am updating my second ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/runtime:6.0-alpine3.19* Runtime image instead to see if it can reduce more image size as follows:
+
+```Dockerfile
+ARG DOTNET_VERSION=6.0
+ARG VARIANT=alpine3.19
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS builder
+LABEL maintainer="Developer Relations"
+
+# Create app directory
+WORKDIR /App
+
+# Copy project files
+COPY ema_solution.sln ./
+COPY EMAConsumer/EMAConsumer.csproj /App/EMAConsumer/EMAConsumer.csproj
+COPY JSONUtil/JSONUtil.csproj /App/JSONUtil/JSONUtil.csproj
+# Restore as distinct layers
+RUN dotnet restore ema_solution.sln
+# Copy everything else
+COPY . ./
+# Build and publish a release
+RUN dotnet publish ema_solution.sln --configuration Release -o out 
+
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION}-${VARIANT} as release
+# Create app directory
+WORKDIR /App
+COPY --from=builder /App/out .
+COPY EMAConsumer/EmaConfig.xml .
+ENTRYPOINT ["dotnet","EMAConsumer.dll"]
+```
+
+Please be noticed that I am using a [Dockerfile ARG instruction](https://docs.docker.com/reference/dockerfile/#arg) to define .NET version and variant variables for easy version and variant updates. You can change these variables in a Dockerfile or via ```docker build``` command using the ```--build-arg <varname>=<value>``` flag.
+
+The final image size result of a ```docker build . -t emacsharp_solution``` command is reduced dramatically to just 92mb as follows.
+
+![figure-5](images/container/container_5.png)
+
+#### Caution
+
+Please be noticed that the final image is based on the [Alpine Linux](https://alpinelinux.org/) which is not been tested and qualified with RTSDK C#. You can change the ```VARIANT``` variable to *focal* to change the final image to *mcr.microsoft.com/dotnet/runtime:6.0-focal* Runtime image which is based on the supported [Ubuntu 20.04](https://releases.ubuntu.com/focal/). However, it has a bigger size image and the RTSDK is not qualified with Docker anyway.
 
 ## Reference
 
 - [Docker: Containerize a .NET application](https://docs.docker.com/language/dotnet/containerize/)
 - [Microsoft Learn: Tutorial - Containerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container?tabs=windows&pivots=dotnet-8-0)
 - [Docker Blog: 9 Tips for Containerizing Your .NET Application](https://www.docker.com/blog/9-tips-for-containerizing-your-net-application/)
--
+- [Microsoft .NET SDK Images](https://hub.docker.com/_/microsoft-dotnet-sdk) website.
+- [Microsoft .NET Runtime Images](https://hub.docker.com/_/microsoft-dotnet-runtime/) website.
+- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
+- [Docker build reference](https://docs.docker.com/reference/cli/docker/image/build/)
+- [Docker run reference](https://docs.docker.com/reference/cli/docker/container/run/)
+
