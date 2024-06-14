@@ -1,5 +1,5 @@
 ARG DOTNET_VERSION=6.0
-ARG VARIANT=alpine3.19
+ARG VARIANT=focal
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS builder
 LABEL maintainer="Developer Relations"
 

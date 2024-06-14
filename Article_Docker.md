@@ -165,51 +165,14 @@ Now, we have optimized our Dockerfile to copy the solution *.sln* and *.csproj* 
 
 The easiest multi-stage builds is to use two ```FROM``` instructions, one is the *full SDK image* for build the application, and another one is the *runtime image* for running the application only. This technique help optimizes a Dockerfile to be in ordered, easy to read and maintain, and also reduce the final image size dramatically.
 
-Microsoft offers various types of images for developers. The [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) is suitable for developing, building, and testing .NET applications, the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) is optimizing for running .NET applications in production. I am using these two images in our multi-stage Dockerfile.
+Microsoft offers various types of images for developers. The [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) is suitable for developing, building, and testing .NET applications, the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) is optimizing for running .NET applications in production.
 
-```Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
-LABEL maintainer="Developer Relations"
-
-# Create app directory
-WORKDIR /App
-
-# Copy project files
-COPY ema_solution.sln ./
-COPY EMAConsumer/EMAConsumer.csproj /App/EMAConsumer/EMAConsumer.csproj
-COPY JSONUtil/JSONUtil.csproj /App/JSONUtil/JSONUtil.csproj
-# Restore as distinct layers
-RUN dotnet restore ema_solution.sln
-# Copy everything else
-COPY . ./
-# Build and publish a release
-RUN dotnet publish ema_solution.sln --configuration Release -o out 
-
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/runtime:6.0 as release
-# Create app directory
-WORKDIR /App
-COPY --from=builder /App/out .
-COPY EMAConsumer/EmaConfig.xml .
-ENTRYPOINT ["dotnet","EMAConsumer.dll"]
-```
-
-Based on a ```Dockerfile``` above, the first ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/sdk:6.0* SDK image as a *builder stage*. The builder stage's instructions is just copy the project files and build an application binary.
-
-The second ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/runtime:6.0* image as a *release stage*. The instructions are just copy the built result from the *build stage* and the EmaConfig.xml file to the final image.
-
-The final image contains only runtime, libraries, and necessary file to run the application. When you rebuild a Docker image with ```docker build . -t emacsharp_solution``` command, the image size is reduced to 193mb as follows.
-
-![figure-4](images/container/container_4.png)
-
-If you recheck a Tags section of the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) page, you will be noticed that the .NET Runtime container images have several variants including the [Alpine variant image](https://www.docker.com/blog/how-to-use-the-alpine-docker-official-image/). The Alpine image has a smaller footprint, takes up less disk space, and supports a package manager (if you need it).
-
-I am updating my second ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/runtime:6.0-alpine3.19* Runtime image instead to see if it can reduce more image size as follows:
+If you recheck a Tags section of the [.NET Runtime images](https://hub.docker.com/_/microsoft-dotnet-runtime/) page, you will be noticed that the .NET Runtime container images have several variants including the *focal* variant which is based on the RTSDK supported [Ubuntu 20.04](https://releases.ubuntu.com/focal/) platform. I am using the *mcr.microsoft.com/dotnet/sdk:6.0* and *mcr.microsoft.com/dotnet/runtime:6.0-focal* images in our multi-stage Dockerfile.
 
 ```Dockerfile
 ARG DOTNET_VERSION=6.0
-ARG VARIANT=alpine3.19
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS builder
+ARG VARIANT=focal
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS builder
 LABEL maintainer="Developer Relations"
 
 # Create app directory
@@ -238,13 +201,29 @@ ENTRYPOINT ["dotnet","EMAConsumer.dll"]
 
 Please be noticed that I am using a [Dockerfile ARG instruction](https://docs.docker.com/reference/dockerfile/#arg) to define .NET version and variant variables for easy version and variant updates. You can change these variables in a Dockerfile or via ```docker build``` command using the ```--build-arg <varname>=<value>``` flag.
 
-The final image size result of a ```docker build . -t emacsharp_solution``` command is reduced dramatically to just 92mb as follows.
+Based on a ```Dockerfile``` above, the first ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/sdk:6.0* SDK image as a *builder stage*. The builder stage's instructions is just copy the project files and build an application binary.
 
-![figure-5](images/container/container_5.png)
+The second ```FROM``` instruction uses the *mcr.microsoft.com/dotnet/runtime:6.0-focal* image as a *release stage*. The instructions are just copy the built result from the *build stage* and the EmaConfig.xml file to the final image.
+
+The final image contains only runtime, libraries, and necessary file to run the application. When you rebuild a Docker image with ```docker build . -t emacsharp_solution``` command, the final image size is reduced to 193mb as follows.
+
+![figure-4](images/container/container_4.png)
 
 #### Caution
 
-Please be noticed that the final image is based on the [Alpine Linux](https://alpinelinux.org/) which is not been tested and qualified with RTSDK C#. You can change the ```VARIANT``` variable to *focal* to change the final image to *mcr.microsoft.com/dotnet/runtime:6.0-focal* Runtime image which is based on the supported [Ubuntu 20.04](https://releases.ubuntu.com/focal/). However, it has a bigger size image and the RTSDK is not qualified with Docker anyway.
+You may be noticed that I am not using the [Alpine variant image](https://www.docker.com/blog/how-to-use-the-alpine-docker-official-image/) which gives you a smaller footprint Docker image on this project. The reason is the [Alpine Linux](https://alpinelinux.org/) is not been tested and qualified with RTSDK.
+
+## Next Steps
+
+This project shows how to build EMA C# Docker image and run it's container locally. There are more things to do such as [run a unit test with your Docker](https://docs.docker.com/language/dotnet/run-tests/), or share a container with a Docker Registry Repository (self hosted or 3rd Party service), etc.
+
+The next reasonable step is to integrate your application image with the continuous integration and continuous delivery (CI/CD) system to complete the develop-build-test-deploy automation pipeline. You can find more detail about how to configure CI/CD for your development project from the following resources:
+
+- [Configure CI/CD for your .NET application](https://docs.docker.com/language/dotnet/configure-ci-cd/)
+- [Introduction to GitHub Actions](https://docs.docker.com/build/ci/github-actions/)
+- [How to build a CI/CD pipeline with Docker and CirCle CI](https://docs.docker.com/build/ci/)
+- [GitLab Docker executor](https://docs.gitlab.com/runner/executors/docker.html)
+- [GitHub Actions](https://docs.github.com/en/actions)
 
 ## Reference
 
