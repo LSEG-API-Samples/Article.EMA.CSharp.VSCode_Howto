@@ -12,7 +12,7 @@ This document explains how to containerize the EMA C# Project and Solution. I am
 
 ## What is a Container?
 
-According to [Docker](https://www.docker.com/resources/what-container/) and [Azure](https://azure.microsoft.com/en-in/resources/cloud-computing-dictionary/what-is-a-container), and [GCP](https://cloud.google.com/learn/what-are-containers) documents, a container is a standard unit of software that packages up code and all its dependencies and configurations files required for the app to run. The application's container can runs quickly and reliably from one computing environment to another. Multiple containers can run on the same machine and share the OS kernel with other containers, each running as isolated processes in user space. The containerized application can be tested as a unit and deployed as a container image instance to the host operating system.
+Let me start by explaining what a Container is. According to [Docker](https://www.docker.com/resources/what-container/) and [Azure](https://azure.microsoft.com/en-in/resources/cloud-computing-dictionary/what-is-a-container), and [GCP](https://cloud.google.com/learn/what-are-containers) documents, a container is a standard unit of software that packages up code and all its dependencies and configurations files required for the app to run. The application's container can runs quickly and reliably from one computing environment to another. Multiple containers can run on the same machine and share the OS kernel with other containers, each running as isolated processes in user space. The containerized application can be tested as a unit and deployed as a container image instance to the host operating system.
 
 ![figure-1](images/container/container_1.png)
 
@@ -27,6 +27,8 @@ Container Benefits:
 - Portability between OS platforms and between clouds.
 - Container is lightweight, so many containers can be supported on the same infrastructure.
 - Easy for rapid scale-up and scale-down scenarios.
+
+That’s all I have to say about a Container overview.
 
 ## <a id="prerequisite"></a>Prerequisite
 
@@ -44,6 +46,8 @@ That covers the prerequisite of this project.
 
 ## Updating EMA Solution Source Code
 
+Now let me turn to the project source code. Actually, you do not need to change the source code to make the project support container, but I have made some changes to make it run via a container easier.
+
 The EMAConsumer project inside the ```ema_solution``` has been updated to receive the following information via a command line argument:
 
 - ```-clientId```: Authentication Version 2 CLIENT_ID information.
@@ -54,13 +58,20 @@ Please see the [Program.cs](./ema_solution/EMAConsumer/Program.cs) for more deta
 
 **Note**: You can also set the *CLIENT_ID* and *CLIENT_SECRET* information via the Environment variables or a ```.env``` file too.
 
+Then you can pass a parameter to change a subscription RIC when you run a program or a container.
+
 ## Containerize EMA C# Project and Solution
+
+Now we come to a step-by-step guide to containerize the EMA C# solution. You need at least two following files in a solution:
+
+1. [Dockerfile](https://docs.docker.com/reference/dockerfile/) file.
+2. [.dockerignore](https://docs.docker.com/build/building/context/#dockerignore-files) file.
 
 The [.NET Docker Images](https://github.com/dotnet/dotnet-docker) are hosted on the [Microsoft Container Registry repository](https://mcr.microsoft.com/en-us/). We can use a [Docker desktop application](https://www.docker.com/products/docker-desktop/) to pull .NET Docker Images directly.
 
 ### Docker ignore file
 
-Before I am going further, let's start by creating a ```.dockerignore``` file inside a ```ema_solution``` folder to define the files/folders that we do not want Docker to build or copy to an image. Those files and folders are the compiled files/folders in our environment and a ```.env``` file.
+Let's start by creating a ```.dockerignore``` file inside a ```ema_solution``` folder to define the files/folders that we do not want Docker to build or copy to an image. Those files and folders are the compiled files/folders in our environment and a ```.env``` file.
 
 ```ini
 EMAConsumer/bin/
@@ -76,7 +87,7 @@ global.json
 
 ### Let's build our first image
 
-The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_solution``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_solution``` folder) is as follows:
+My next point is a ```Dockerfile``` content that defines an application image. The easiest way is to copy our project/solution source code to a container and use [.NET SDK images](https://hub.docker.com/_/microsoft-dotnet-sdk/) to build and run the application. I am demonstrating with the ```ema_solution``` project with the ```mcr.microsoft.com/dotnet/sdk:6.0``` .NET 6 Docker image. A ```Dockerfile``` (inside a ```ema_solution``` folder) is as follows:
 
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:6.0
@@ -161,7 +172,7 @@ Now, we have optimized our Dockerfile to copy the solution *.sln* and *.csproj* 
 
 ### Multi-Stage Builds
 
-[Docker Multi-stage builds](https://docs.docker.com/build/building/multi-stage/) is a technique for optimizing a Dockerfile with multiple ```FROM``` statements. Each ```FROM``` instruction can use a different image base,and each of them begins a new stage of the build. You can selectively copy artifacts from one stage to another, leaving behind everything you don't want in the final image.
+That brings us to a next technique called "Multi-Stage Builds". [Docker Multi-stage builds](https://docs.docker.com/build/building/multi-stage/) is a technique for optimizing a Dockerfile with multiple ```FROM``` statements. Each ```FROM``` instruction can use a different image base,and each of them begins a new stage of the build. You can selectively copy artifacts from one stage to another, leaving behind everything you don't want in the final image.
 
 The easiest multi-stage builds is to use two ```FROM``` instructions, one is the *full SDK image* for build the application, and another one is the *runtime image* for running the application only. This technique help optimizes a Dockerfile to be in ordered, easy to read and maintain, and also reduce the final image size dramatically.
 
@@ -213,9 +224,11 @@ The final image contains only runtime, libraries, and necessary file to run the 
 
 You may be noticed that I am not using the [Alpine variant image](https://www.docker.com/blog/how-to-use-the-alpine-docker-official-image/) which gives you a smaller footprint Docker image on this project. The reason is the [Alpine Linux](https://alpinelinux.org/) is not been tested and qualified with RTSDK.
 
+That covers Multi-Stage Builds process.
+
 ## Next Steps
 
-This project shows how to build EMA C# Docker image and run it's container locally. There are more things to do such as [run a unit test with your Docker](https://docs.docker.com/language/dotnet/run-tests/), or share a container with a Docker Registry Repository (self hosted or 3rd Party service), etc.
+Before I finish, let me just say about a containerization next steps. This project shows how to build EMA C# Docker image and run it's container locally. There are more things to do such as [run a unit test with your Docker](https://docs.docker.com/language/dotnet/run-tests/), or share a container with a Docker Registry Repository (self hosted or 3rd Party service), etc.
 
 The next reasonable step is to integrate your application image with the continuous integration and continuous delivery (CI/CD) system to complete the develop-build-test-deploy automation pipeline. You can find more detail about how to configure CI/CD for your development project from the following resources:
 
@@ -224,6 +237,8 @@ The next reasonable step is to integrate your application image with the continu
 - [How to build a CI/CD pipeline with Docker and CirCle CI](https://docs.docker.com/build/ci/)
 - [GitLab Docker executor](https://docs.gitlab.com/runner/executors/docker.html)
 - [GitHub Actions](https://docs.github.com/en/actions)
+
+That completes this containerization project.
 
 ## Reference
 
