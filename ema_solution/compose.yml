@@ -1,0 +1,7 @@
+name: ema_csharp_soltuion
+
+services:
+  console-rto:
+    build: .
+    env_file: "./EMAConsumer/.env"
+    command: -itemName EUR=

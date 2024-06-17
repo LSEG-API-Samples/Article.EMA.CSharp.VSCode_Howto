@@ -226,6 +226,60 @@ You may be noticed that I am not using the [Alpine variant image](https://www.do
 
 That covers Multi-Stage Builds process.
 
+### Docker Compose
+
+Now, what about a [Docker Compose](https://docs.docker.com/compose/)? Docker Compose is a tool for defining and running multi-container applications. It lets you control multi-container applications via just a single ```compose.yml``` [YAML file](https://yaml.org/). You can define multiple container settings such as port and volume mapping, container start up order, container build arguments, container run-time arguments, etc. and then start all containers with just a single ```docker compose up``` command.
+
+Docker Compose is useful when you have multiple containers like *Consumer - Interactive Provider* use-case on the [How to deploy and run Real-Time Java Application with Maven in Docker](https://developers.lseg.com/en/article-catalog/article/how-to-deploy-and-run-real-time-java-application-with-maven-in-d) article. It is also helpful if you need to start container(s) with a long list of parameters (port and volume mapping, etc.) with just a simple command.
+
+To add a Docker Compose to the EMA C# Solution, you need to add a ```compose.yml``` file with the following content to the ```ema_solution``` root folder.
+
+```yml
+name: ema_csharp_soltuion
+
+services:
+  console-rto:
+    build: .
+    env_file: "./EMAConsumer/.env"
+    command: -itemName EUR=
+```
+
+Then use  a Docker [docker compose up](https://docs.docker.com/reference/cli/docker/compose/up/) command to build, start, and link all containers defined in a ```compose.yml``` file.
+
+If image(s) need to build (or re-build), Docker compose builds images for users.
+
+![figure-5](images/container/docker_compose_1.png "Docker Compose building images")
+
+And then Docker Compose starts container(s) automatically.
+
+![figure-6](images/container/docker_compose_2.png "Docker Compose run container")
+
+You can press *Ctrl + C* buttons or run a [docker compose down](https://docs.docker.com/reference/cli/docker/compose/down/) command to stop containers.
+
+Docker Container also caches the configuration used to create a container. When you restart a service that has not changed, Compose re-uses the existing containers.
+
+![figure-7](images/container/docker_compose_3.png "Docker Compose re-run already created container")
+
+You can also run container with [docker compose run](https://docs.docker.com/reference/cli/docker/compose/run/) with a main service name as follows:
+
+```bash
+docker composer run <service name> <application arguments>
+```
+
+According to our ```compose.yml``` file, our service name is ```console-rto```, so a command would be:
+
+```bash
+docker composer run console-rto -itemName AUD=
+```
+
+Result:
+
+![figure-8](images/container/docker_compose_4.png "Docker Compose run command")
+
+Like I said earlier, Docker Compose is useful when you have multi-containers applications. You can integrate this EMA C# RTO application with a [Simulated RTO Environment](https://developers.lseg.com/en/article-catalog/article/setup-a-simulated-real-time-optimized-environment-in-3-steps) ([Docker image](https://developers.lseg.com/en/article-catalog/article/introduction-to-the-refinitiv-real-time-optimized-simulator-dock)) for testing purpose, or other applications that process RTO data in the same ```compose.yml``` file.
+
+That’s all I have to say about a Docker Compose.
+
 ## Next Steps
 
 Before I finish, let me just say about a containerization next steps. This project shows how to build EMA C# Docker image and run it's container locally. There are more things to do such as [run a unit test with your Docker](https://docs.docker.com/language/dotnet/run-tests/), or share a container with a Docker Registry Repository (self hosted or 3rd Party service), etc.
