@@ -1,7 +1,7 @@
 # Step By Step Guide EMA C# project and solution with VS Code
 
-- version: 1.0.1
-- Last Update: June 2024
+- version: 1.0.2
+- Last Update: October 2024
 - Environment: Ubuntu or Windows
 - Compiler: .NET 6.0
 - Prerequisite: [prerequisite](#prerequisite)
@@ -13,9 +13,11 @@ ALL EXAMPLE CODE IS PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS FOR 
 
 [Real-Time SDK (C# Edition)](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) (RTSDK, formerly known as Elektron SDK) is a suite of modern and open source APIs ([GitHub](https://github.com/Refinitiv/Real-Time-SDK)) that aim to simplify development through a strong focus on ease of use and standardized access to LSEG Real-Time Platform via the proprietary TCP connection named RSSL and proprietary binary message encoding format named OMM Message. The capabilities range from low latency/high-performance APIs right through to simple streaming Web APIs.
 
-The RTSDK C# Edition can run on Windows, Oracle Linux Server, Red Hat Enterprise Server and Ubuntu Linux platforms. It supports the [Visual Studio 2022 IDE](https://visualstudio.microsoft.com/vs/) for the full features development experience but the IDE is available for Windows developers only. Fortunately, the RTSDK C# Edition also supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) framework and the [Visual Studio Code](https://code.visualstudio.com/) (aka VS Code) editor is available for all major OS platforms. Linux and Windows developers who are using the VS Code editor can implement the real-time streaming application with LSEG Real-Time platform using the RTSDK C# Edition.
+The RTSDK C# Edition can run on Windows, Oracle Linux Server, Red Hat Enterprise Server and Ubuntu Linux platforms. It supports the [Visual Studio 2022 IDE](https://visualstudio.microsoft.com/vs/) for the full features development experience but the IDE is available for Windows developers only. Fortunately, the RTSDK C# Edition also supports the cross-platform [.NET CORE](https://devblogs.microsoft.com/dotnet/net-core-is-open-source/) and the [Visual Studio Code](https://code.visualstudio.com/) (aka VS Code) editor is available for all major OS platforms. Linux and Windows developers who are using the VS Code editor can implement the real-time streaming application with LSEG Real-Time platform using the RTSDK C# Edition.
 
-This example project shows a step-by-step guide to create the EMA API .NET project and solution with the RTSDK C# Edition on VS Code and the [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp). I am demonstrating with the RTSDK C# version 2.1.3.L1 on Ubuntu Linux, and this step-by-step guide can be applied to any supported OS platforms.
+This example project shows a step-by-step guide to create the EMA API .NET project and solution with the RTSDK C# Edition *connect to the Real-Time Optimized (RTO) server* on VS Code and the [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp). I am demonstrating with the RTSDK C# version 2.1.3.L1 on Ubuntu Linux, and this step-by-step guide can be applied to any supported OS platforms.
+
+**Note**: For developers who connect to the Real-Time Distribution System (RTDS), you can apply the steps to set up the project, solution and the libraries. However, please check the [100_MP_Streaming example](https://github.com/Refinitiv/Real-Time-SDK/tree/master/CSharp/Ema/Examples/Training/Consumer/100_Series/100_MP_Streaming) and *Cons100* section on the [RTSDK C# QuickStart](https://developers.lseg.com/en/api-catalog/real-time-opnsrc/rt-sdk-csharp/quick-start) page for the source code part.
 
 ## <a id="prerequisite"></a>Prerequisite
 
@@ -23,9 +25,11 @@ Before I am going further, there is some prerequisite, dependencies, and librari
 
 ### .NET SDK
 
-Firstly, you need .NET 6 SDK. You can download the SDK based on your system from [Microsoft .NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) website.
+Firstly, you need .NET 6 SDK for this project. You can download the SDK based on your system from [Microsoft .NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) website.
 
 Please check [How to check that .NET is already installed](https://learn.microsoft.com/en-us/dotnet/core/install/how-to-detect-installed-versions) to verify installed .NET versions on your machine.
+
+**Note**: Please check the RTSDK C# versions and .NET versions supported from the [API Compatibility Matrix](https://developers.lseg.com/en/api-catalog/real-time-opnsrc/rt-sdk-csharp/documentation#api-compatibility-matrix) document.
 
 ### Visual Studio Code
 
@@ -41,6 +45,13 @@ Next, the [VS Code](https://code.visualstudio.com/) editor tool with the free [C
 This project uses RTO access credentials for Version 2 Authentication (Service ID).
 
 Please contact your LSEG representative to help you with the RTO account and services.
+
+**Note**: For developers who connect to the Real-Time Distribution System (RTDS), you need the following information:
+
+- Your ADS Server or Interactive-Provider application hostname or IP Address
+- Your ADS Server or Interactive-Provider application RSSL Port number (14002 by default)
+- Your Market Data Service Name 
+- Your Data Access Control System (DACS) User name
 
 ### Internet Access
 

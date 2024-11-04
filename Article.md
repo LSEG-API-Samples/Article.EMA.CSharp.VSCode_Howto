@@ -4,9 +4,11 @@
 
 [Real-Time SDK (C# Edition)](https://developers.lseg.com/en/api-catalog/refinitiv-real-time-opnsrc/refinitiv-real-time-csharp-sdk) (RTSDK, formerly known as Elektron SDK) is a suite of modern and open source APIs ([GitHub](https://github.com/Refinitiv/Real-Time-SDK)) that aim to simplify development through a strong focus on ease of use and standardized access to a broad set of Refinitiv proprietary content and services via the proprietary TCP connection named RSSL and proprietary binary message encoding format named OMM Message. The capabilities range from low latency/high-performance APIs right through to simple streaming Web APIs.
 
-The RTSDK C# Edition can run on Windows, Oracle Linux Server, Red Hat Enterprise Server and Ubuntu Linux platforms. It supports the [Visual Studio 2022 IDE](https://visualstudio.microsoft.com/vs/) for the full features development experience but the IDE is available for Windows developers only. Fortunately, the RTSDK C# Edition also supports the cross-platform [.NET SDK 6](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6) (aka .NET Core 6) framework and the [Visual Studio Code](https://code.visualstudio.com/) (aka VS Code) editor is available for all major OS platforms. Linux and Windows developers who are using the VS Code editor can implement the real-time streaming application with LSEG Real-Time platform using the RTSDK C# Edition.
+The RTSDK C# Edition can run on Windows, Oracle Linux Server, Red Hat Enterprise Server and Ubuntu Linux platforms. It supports the [Visual Studio 2022 IDE](https://visualstudio.microsoft.com/vs/) for the full features development experience but the IDE is available for Windows developers only. Fortunately, the RTSDK C# Edition also supports the cross-platform [.NET CORE](https://devblogs.microsoft.com/dotnet/net-core-is-open-source/) and the [Visual Studio Code](https://code.visualstudio.com/) (aka VS Code) editor is available for all major OS platforms. Linux and Windows developers who are using the VS Code editor can implement the real-time streaming application with LSEG Real-Time platform using the RTSDK C# Edition.
 
-This example project shows a step-by-step guide to create the EMA API .NET project and solution with the RTSDK C# Edition on VS Code and the [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp). I am demonstrating with the RTSDK C# version 2.1.3.L1 on Ubuntu Linux, and this step-by-step guide can be applied to any supported OS platforms.
+This example project shows a step-by-step guide to create the EMA API .NET project and solution with the RTSDK C# Edition *connect to the Real-Time Optimized (RTO) server* on VS Code and the [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp). I am demonstrating with the RTSDK C# version 2.1.3.L1 on Ubuntu Linux, and this step-by-step guide can be applied to any supported OS platforms.
+
+**Note**: For developers who connect to the Real-Time Distribution System (RTDS), you can apply the steps to set up the project, solution and the libraries. However, please check the [100_MP_Streaming example](https://github.com/Refinitiv/Real-Time-SDK/tree/master/CSharp/Ema/Examples/Training/Consumer/100_Series/100_MP_Streaming) and *Cons100* section on the [RTSDK C# QuickStart](https://developers.lseg.com/en/api-catalog/real-time-opnsrc/rt-sdk-csharp/quick-start) page for the source code part.
 
 ## <a id="create_project"></a>Create the EMA API Real-Time Application Project
 
@@ -99,6 +101,8 @@ Project 'ema_project' has the following package references
 Now the ema_project is ready for implementing the real-time application with EMA C# API.
 
 ### <a id="add_ema_code"></a>Add the Real-Time Application Source Code with EMA
+
+Please let me remind you again, if you environment connects to the Real-Time Distribution System (RTDS), please check the [100_MP_Streaming example source code](https://github.com/Refinitiv/Real-Time-SDK/tree/master/CSharp/Ema/Examples/Training/Consumer/100_Series/100_MP_Streaming) and *Cons100* section on the [RTSDK C# QuickStart](https://developers.lseg.com/en/api-catalog/real-time-opnsrc/rt-sdk-csharp/quick-start) page for the source code part. The code below on this article connects to the RTO (Real-Time Optimized on the Cloud).
 
 So, now let’s look at the real-time application source code. The next step is to changing the ```Program.cs``` file source code to call EMA library to connect and consume data from RTO.
 
